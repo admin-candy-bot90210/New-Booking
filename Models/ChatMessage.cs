@@ -113,4 +113,18 @@ namespace DJBookingSystem.Models
         Warning,
         ReportResolved
     }
+
+    public class SupportMessage
+    {
+        public string? Id { get; set; }
+        public string ContactName { get; set; } = string.Empty;
+        public string ContactEmail { get; set; } = string.Empty;
+        public string Subject { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+        public DateTime SubmittedAt { get; set; } = DateTime.Now;
+        public bool IsResolved { get; set; } = false;
+        public string? ResolvedBy { get; set; }
+        public DateTime? ResolvedAt { get; set; }
+        public string? AdminResponse { get; set; }
+    }
 }

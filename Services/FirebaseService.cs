@@ -219,6 +219,30 @@ namespace DJBookingSystem.Services
                 .DeleteAsync();
         }
 
+        // Delete user account and all related data (for user self-deletion)
+        public async Task DeleteUserAccountAsync(string username)
+        {
+            var user = await GetUserByUsernameAsync(username);
+            if (user == null || string.IsNullOrEmpty(user.Id))
+                return;
+
+            // Delete user's chat settings
+            try
+            {
+                await _firebaseClient
+                    .Child("chat_settings")
+                    .Child(username)
+                    .DeleteAsync();
+            }
+            catch { /* Settings may not exist */ }
+
+            // Delete user's bookings (optional - depends on business logic)
+            // For now, we'll keep bookings for historical records
+
+            // Delete the user account
+            await DeleteUserAsync(user.Id);
+        }
+
         // Initialize default admin account
         public async Task InitializeDefaultAdminAsync()
         {
@@ -650,6 +674,49 @@ namespace DJBookingSystem.Services
             {
                 return null;
             }
+        }
+
+        // SUPPORT MESSAGES (Pre-login contact)
+
+        // Submit support message (for users who can't log in)
+        public async Task<string> SubmitSupportMessageAsync(SupportMessage message)
+        {
+            var result = await _firebaseClient
+                .Child("support_messages")
+                .PostAsync(message);
+
+            return result.Key;
+        }
+
+        // Get all support messages (for admins)
+        public async Task<List<SupportMessage>> GetAllSupportMessagesAsync()
+        {
+            var messages = await _firebaseClient
+                .Child("support_messages")
+                .OnceAsync<SupportMessage>();
+
+            return messages.Select(m => new SupportMessage
+            {
+                Id = m.Key,
+                ContactName = m.Object.ContactName,
+                ContactEmail = m.Object.ContactEmail,
+                Subject = m.Object.Subject,
+                Message = m.Object.Message,
+                SubmittedAt = m.Object.SubmittedAt,
+                IsResolved = m.Object.IsResolved,
+                ResolvedBy = m.Object.ResolvedBy,
+                ResolvedAt = m.Object.ResolvedAt,
+                AdminResponse = m.Object.AdminResponse
+            }).OrderByDescending(m => m.SubmittedAt).ToList();
+        }
+
+        // Update support message (for admin response)
+        public async Task UpdateSupportMessageAsync(string id, SupportMessage message)
+        {
+            await _firebaseClient
+                .Child("support_messages")
+                .Child(id)
+                .PutAsync(message);
         }
 
         // Log error to chat (automatically sent to SysAdmin)
