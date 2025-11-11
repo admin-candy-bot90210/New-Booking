@@ -15,12 +15,13 @@
         </Storyboard>
     </Window.Resources>
 
-    <Border Background="#1a1a1a" CornerRadius="15" BorderBrush="#E67E22" BorderThickness="3">
+    <!-- Semi-transparent background -->
+    <Border Background="#CC1a1a1a" CornerRadius="15" BorderBrush="#E67E22" BorderThickness="3">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="80"/>
+                <RowDefinition Height="120"/>
             </Grid.RowDefinitions>
 
             <!-- Logo Image -->
@@ -33,7 +34,7 @@
             <!-- Loading Text -->
             <TextBlock x:Name="LoadingTextBlock"
                       Grid.Row="1"
-                      Text="LOADING..."
+                      Text="3DXCHAT DJ BOOKING"
                       FontSize="28"
                       FontWeight="Bold"
                       Foreground="White"
@@ -45,6 +46,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="30"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- Percentage Text -->
@@ -82,6 +84,19 @@
                         </Border>
                     </Grid>
                 </Border>
+
+                <!-- Humorous Loading Message (UNDER the progress bar) -->
+                <TextBlock x:Name="HumorousMessageTextBlock"
+                          Grid.Row="2"
+                          Text=""
+                          FontSize="14"
+                          FontStyle="Italic"
+                          Foreground="#FFD700"
+                          HorizontalAlignment="Center"
+                          TextAlignment="Center"
+                          TextWrapping="Wrap"
+                          Margin="0,15,0,0"
+                          Opacity="0.9"/>
             </Grid>
         </Grid>
     </Border>
