@@ -400,6 +400,32 @@ namespace DJBookingSystem
             }
         }
 
+        // Copy streaming link from booking list
+        private void CopyStreamingLink_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is string streamingLink)
+            {
+                try
+                {
+                    if (string.IsNullOrWhiteSpace(streamingLink))
+                    {
+                        MessageBox.Show("No streaming link available.", "Error",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    Clipboard.SetText(streamingLink);
+                    MessageBox.Show("Streaming link copied to clipboard!", "Success",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to copy link: {ex.Message}", "Error",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
         // Edit booking
         private async void EditBooking_Click(object sender, RoutedEventArgs e)
         {

@@ -14,6 +14,10 @@ namespace DJBookingSystem.ViewModels
         public BookingStatus Status { get; set; }
         public int DurationHours { get; set; }
 
+        // For copy button functionality
+        public string ActualStreamingLink { get; set; } = string.Empty;
+        public bool CanCopyStreamingLink { get; set; } = false;
+
         public static BookingViewModel FromBooking(Booking booking, User currentUser, System.Collections.Generic.List<Venue> allVenues)
         {
             var venue = allVenues.Find(v => v.RoomName == booking.Venue);
@@ -24,7 +28,7 @@ namespace DJBookingSystem.ViewModels
             {
                 canSeeStreamingLink = true;
             }
-            else if (venue != null && venue.OwnerUsername == currentUser.Username)
+            else if (currentUser.IsVenueOwner && venue != null && venue.OwnerUsername == currentUser.Username)
             {
                 canSeeStreamingLink = true;
             }
@@ -38,7 +42,9 @@ namespace DJBookingSystem.ViewModels
                 BookingDate = booking.BookingDate,
                 CreatedAt = booking.CreatedAt,
                 Status = booking.Status,
-                DurationHours = booking.DurationHours
+                DurationHours = booking.DurationHours,
+                ActualStreamingLink = booking.StreamingLink,
+                CanCopyStreamingLink = canSeeStreamingLink
             };
         }
     }

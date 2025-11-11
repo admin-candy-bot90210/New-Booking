@@ -82,10 +82,29 @@
                              IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="DJ Name" Binding="{Binding DJName}" Width="200"/>
-                            <DataGridTextColumn Header="Streaming Link" Binding="{Binding StreamingLink}" Width="300"/>
+                            <DataGridTextColumn x:Name="StreamingLinkColumn" Header="Streaming Link" Binding="{Binding StreamingLink}" Width="300"/>
                             <DataGridTextColumn Header="Venue" Binding="{Binding Venue}" Width="200"/>
                             <DataGridTextColumn Header="Booking Date" Binding="{Binding BookingDate, StringFormat=\{0:MM/dd/yyyy HH:mm\}}" Width="150"/>
                             <DataGridTextColumn Header="Created" Binding="{Binding CreatedAt, StringFormat=\{0:MM/dd/yyyy\}}" Width="120"/>
+                            <DataGridTemplateColumn Header="Actions" Width="150">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Content="📋 Copy Link"
+                                                   Click="CopyStreamingLink_Click"
+                                                   Tag="{Binding ActualStreamingLink}"
+                                                   Padding="8,4"
+                                                   Margin="2"
+                                                   Background="#27AE60"
+                                                   Foreground="White"
+                                                   BorderThickness="0"
+                                                   Cursor="Hand"
+                                                   FontSize="11"
+                                                   Visibility="{Binding CanCopyStreamingLink, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
 
