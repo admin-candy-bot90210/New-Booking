@@ -205,29 +205,36 @@ namespace DJBookingSystem
 
         private UserPermissions GetDefaultPermissionsForAccountType(bool isDJ, bool isVenueOwner)
         {
+            // Default permissions for regular users (DJ/Venue Owner)
             return new UserPermissions
             {
-                // Booking permissions - DJs can view and create
+                // Booking permissions
                 CanViewBookings = true,
-                CanCreateBookings = isDJ, // Only DJs can create bookings
-                CanEditBookings = isDJ,
-                CanDeleteBookings = false,
+                CanCreateBookings = true, // Both DJs and Venue Owners can create bookings
+                CanEditBookings = true,
+                CanDeleteBookings = true, // DJs can delete their own bookings, Venue Owners can delete bookings at their venues
 
-                // Venue permissions - Venue owners can register and manage
+                // Venue permissions
                 CanViewVenues = true,
                 CanRegisterVenues = isVenueOwner, // Only venue owners can register venues
-                CanEditVenues = isVenueOwner,
-                CanDeleteVenues = false,
-                CanToggleVenueStatus = isVenueOwner,
+                CanEditVenues = isVenueOwner, // Only venue owners can edit their own venues
+                CanDeleteVenues = isVenueOwner, // Only venue owners can delete their own venues
+                CanToggleVenueStatus = isVenueOwner, // Only venue owners can toggle their venue status
 
                 // Admin permissions - none for regular users
                 CanManageUsers = false,
                 CanCustomizeApp = false,
                 CanAccessSettings = true,
 
-                // RadioBOSS permissions - none for regular users
-                CanViewRadioBoss = false,
-                CanControlRadioBoss = false
+                // RadioBOSS permissions - can view to listen, but not control
+                CanViewRadioBoss = true, // Everyone can view/listen to RadioBoss
+                CanControlRadioBoss = false, // Regular users cannot control RadioBoss
+
+                // Moderation permissions - none for regular users
+                CanBanUsers = false,
+                CanMuteUsers = false,
+                CanViewReports = false,
+                CanResolveReports = false
             };
         }
 

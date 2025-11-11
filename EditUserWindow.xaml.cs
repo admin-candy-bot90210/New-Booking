@@ -144,6 +144,7 @@ namespace DJBookingSystem
             switch (role)
             {
                 case UserRole.SysAdmin:
+                    // SysAdmin has ALL permissions
                     return new UserPermissions
                     {
                         CanViewBookings = true,
@@ -159,10 +160,15 @@ namespace DJBookingSystem
                         CanCustomizeApp = true,
                         CanAccessSettings = true,
                         CanViewRadioBoss = true,
-                        CanControlRadioBoss = true
+                        CanControlRadioBoss = true,
+                        CanBanUsers = true,
+                        CanMuteUsers = true,
+                        CanViewReports = true,
+                        CanResolveReports = true
                     };
 
                 case UserRole.Manager:
+                    // Manager has ALL permissions EXCEPT CanCustomizeApp
                     return new UserPermissions
                     {
                         CanViewBookings = true,
@@ -172,33 +178,42 @@ namespace DJBookingSystem
                         CanViewVenues = true,
                         CanRegisterVenues = true,
                         CanEditVenues = true,
-                        CanDeleteVenues = false,
+                        CanDeleteVenues = true,
                         CanToggleVenueStatus = true,
-                        CanManageUsers = false,
-                        CanCustomizeApp = false,
+                        CanManageUsers = true,
+                        CanCustomizeApp = false, // Only difference from SysAdmin
                         CanAccessSettings = true,
-                        CanViewRadioBoss = false,
-                        CanControlRadioBoss = false
+                        CanViewRadioBoss = true,
+                        CanControlRadioBoss = true,
+                        CanBanUsers = true,
+                        CanMuteUsers = true,
+                        CanViewReports = true,
+                        CanResolveReports = true
                     };
 
                 case UserRole.User:
                 default:
+                    // Regular users (DJ/Venue Owner) - limited permissions
                     return new UserPermissions
                     {
                         CanViewBookings = true,
                         CanCreateBookings = true,
                         CanEditBookings = true,
-                        CanDeleteBookings = false,
+                        CanDeleteBookings = true, // Can delete their own bookings/bookings at their venues
                         CanViewVenues = true,
-                        CanRegisterVenues = true,
-                        CanEditVenues = false,
-                        CanDeleteVenues = false,
-                        CanToggleVenueStatus = false,
+                        CanRegisterVenues = false, // Set based on IsVenueOwner in registration
+                        CanEditVenues = false, // Set based on IsVenueOwner in registration
+                        CanDeleteVenues = false, // Set based on IsVenueOwner in registration
+                        CanToggleVenueStatus = false, // Set based on IsVenueOwner in registration
                         CanManageUsers = false,
                         CanCustomizeApp = false,
                         CanAccessSettings = true,
-                        CanViewRadioBoss = false,
-                        CanControlRadioBoss = false
+                        CanViewRadioBoss = true, // Can view/listen to RadioBoss
+                        CanControlRadioBoss = false,
+                        CanBanUsers = false,
+                        CanMuteUsers = false,
+                        CanViewReports = false,
+                        CanResolveReports = false
                     };
             }
         }
