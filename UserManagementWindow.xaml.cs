@@ -62,12 +62,19 @@ namespace DJBookingSystem
         {
             if (UsersDataGrid.SelectedItem is User user)
             {
+                // Safety check: Ensure user has valid ID
+                if (string.IsNullOrEmpty(user.Id))
+                {
+                    MessageBox.Show("User ID is missing. Cannot edit this user.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
                 var editWindow = new EditUserWindow(user);
                 if (editWindow.ShowDialog() == true && editWindow.UpdatedUser != null)
                 {
                     try
                     {
-                        await _firebaseService.UpdateUserAsync(user.Id ?? "", editWindow.UpdatedUser);
+                        await _firebaseService.UpdateUserAsync(user.Id, editWindow.UpdatedUser);
                         MessageBox.Show("User updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                         LoadUsers();
                     }
@@ -87,13 +94,20 @@ namespace DJBookingSystem
         {
             if (UsersDataGrid.SelectedItem is User user)
             {
+                // Safety check: Ensure user has valid ID
+                if (string.IsNullOrEmpty(user.Id))
+                {
+                    MessageBox.Show("User ID is missing. Cannot edit permissions.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
                 var permWindow = new EditPermissionsWindow(user);
                 if (permWindow.ShowDialog() == true && permWindow.UpdatedPermissions != null)
                 {
                     try
                     {
                         user.Permissions = permWindow.UpdatedPermissions;
-                        await _firebaseService.UpdateUserAsync(user.Id ?? "", user);
+                        await _firebaseService.UpdateUserAsync(user.Id, user);
                         MessageBox.Show("Permissions updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                         LoadUsers();
                     }
@@ -113,13 +127,20 @@ namespace DJBookingSystem
         {
             if (UsersDataGrid.SelectedItem is User user)
             {
+                // Safety check: Ensure user has valid ID
+                if (string.IsNullOrEmpty(user.Id))
+                {
+                    MessageBox.Show("User ID is missing. Cannot edit detailed permissions.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
                 var detailedPermWindow = new DetailedPermissionsWindow(user);
                 if (detailedPermWindow.ShowDialog() == true && detailedPermWindow.UpdatedPermissions != null)
                 {
                     try
                     {
                         user.Permissions = detailedPermWindow.UpdatedPermissions;
-                        await _firebaseService.UpdateUserAsync(user.Id ?? "", user);
+                        await _firebaseService.UpdateUserAsync(user.Id, user);
                         MessageBox.Show("Detailed permissions updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                         LoadUsers();
                     }
@@ -139,10 +160,17 @@ namespace DJBookingSystem
         {
             if (UsersDataGrid.SelectedItem is User user)
             {
+                // Safety check: Ensure user has valid ID
+                if (string.IsNullOrEmpty(user.Id))
+                {
+                    MessageBox.Show("User ID is missing. Cannot toggle status.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
                 try
                 {
                     user.IsActive = !user.IsActive;
-                    await _firebaseService.UpdateUserAsync(user.Id ?? "", user);
+                    await _firebaseService.UpdateUserAsync(user.Id, user);
                     MessageBox.Show($"User '{user.Username}' is now {(user.IsActive ? "Active" : "Inactive")}.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                     LoadUsers();
                 }
@@ -161,6 +189,13 @@ namespace DJBookingSystem
         {
             if (UsersDataGrid.SelectedItem is User user)
             {
+                // Safety check: Ensure user has valid ID
+                if (string.IsNullOrEmpty(user.Id))
+                {
+                    MessageBox.Show("User ID is missing. Cannot delete this user.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
                 // Check if this is the last SysAdmin
                 int sysAdminCount = _users.Count(u => u.Role == UserRole.SysAdmin);
                 if (user.Role == UserRole.SysAdmin && sysAdminCount <= 1)
@@ -179,7 +214,7 @@ namespace DJBookingSystem
                 {
                     try
                     {
-                        await _firebaseService.DeleteUserAsync(user.Id ?? "");
+                        await _firebaseService.DeleteUserAsync(user.Id);
                         MessageBox.Show("User deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                         LoadUsers();
                     }

@@ -73,7 +73,12 @@ namespace DJBookingSystem
 
                 // Update last login
                 user.LastLogin = DateTime.Now;
-                await _firebaseService.UpdateUserAsync(user.Id ?? "", user);
+
+                // Safety check: Only update if user has valid ID
+                if (!string.IsNullOrEmpty(user.Id))
+                {
+                    await _firebaseService.UpdateUserAsync(user.Id, user);
+                }
 
                 // Save login info if Remember Me is checked
                 bool rememberMe = RememberMeCheckBox.IsChecked ?? false;

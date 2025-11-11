@@ -306,9 +306,18 @@ namespace DJBookingSystem
         // Apply filter to bookings list
         private void ApplyVenueFilter()
         {
+            // DATE RANGE FILTER: Only show bookings within 1 week from today
+            DateTime now = DateTime.Now;
+            DateTime oneWeekFromNow = now.AddDays(7);
+
+            // Filter: Remove past bookings and bookings beyond 1 week
+            var dateFiltered = _allBookings.Where(b =>
+                b.BookingDate >= now &&
+                b.BookingDate <= oneWeekFromNow).ToList();
+
             if (VenueFilterComboBox.SelectedItem == null)
             {
-                var viewModels = _allBookings.Select(b => BookingViewModel.FromBooking(b, _currentUser, _allVenues)).ToList();
+                var viewModels = dateFiltered.Select(b => BookingViewModel.FromBooking(b, _currentUser, _allVenues)).ToList();
                 BookingsDataGrid.ItemsSource = viewModels;
                 return;
             }
@@ -317,12 +326,13 @@ namespace DJBookingSystem
 
             if (selectedVenue == "All Venues")
             {
-                var viewModels = _allBookings.Select(b => BookingViewModel.FromBooking(b, _currentUser, _allVenues)).ToList();
+                var viewModels = dateFiltered.Select(b => BookingViewModel.FromBooking(b, _currentUser, _allVenues)).ToList();
                 BookingsDataGrid.ItemsSource = viewModels;
             }
             else
             {
-                var filtered = _allBookings.Where(b => b.Venue == selectedVenue).ToList();
+                // Apply both date filter AND venue filter
+                var filtered = dateFiltered.Where(b => b.Venue == selectedVenue).ToList();
                 var viewModels = filtered.Select(b => BookingViewModel.FromBooking(b, _currentUser, _allVenues)).ToList();
                 BookingsDataGrid.ItemsSource = viewModels;
             }

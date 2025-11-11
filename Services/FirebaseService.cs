@@ -232,7 +232,7 @@ namespace DJBookingSystem.Services
                     var primarySysAdmin = new User
                     {
                         Username = "SysAdmin",
-                        PasswordHash = "d8dffb2b4a7ede9c6e409bb120adc43bd0fd98e6f390424c13fa9768602573fb", // "Fraser1960@"
+                        PasswordHash = "d8dffb2b4a7ede9c6e409bb120adc43bd0fd98e6f390424c13fa9768602573fb",
                         FullName = "System Administrator",
                         Email = "sysadmin@djbooking.com",
                         Role = UserRole.SysAdmin,
@@ -258,40 +258,6 @@ namespace DJBookingSystem.Services
                     };
 
                     await AddUserAsync(primarySysAdmin);
-                }
-
-                // Create secondary admin account if no other SysAdmin exists
-                if (!users.Any(u => u.Username == "admin"))
-                {
-                    var defaultAdmin = new User
-                    {
-                        Username = "admin",
-                        PasswordHash = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", // "admin123"
-                        FullName = "Default Administrator",
-                        Email = "admin@djbooking.com",
-                        Role = UserRole.SysAdmin,
-                        Permissions = new UserPermissions
-                        {
-                            CanViewBookings = true,
-                            CanCreateBookings = true,
-                            CanEditBookings = true,
-                            CanDeleteBookings = true,
-                            CanViewVenues = true,
-                            CanRegisterVenues = true,
-                            CanEditVenues = true,
-                            CanDeleteVenues = true,
-                            CanToggleVenueStatus = true,
-                            CanManageUsers = true,
-                            CanCustomizeApp = true,
-                            CanAccessSettings = true,
-                            CanViewRadioBoss = true,
-                            CanControlRadioBoss = true
-                        },
-                        IsActive = true,
-                        CreatedAt = DateTime.Now
-                    };
-
-                    await AddUserAsync(defaultAdmin);
                 }
             }
             catch

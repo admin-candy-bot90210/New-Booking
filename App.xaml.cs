@@ -49,7 +49,12 @@ namespace DJBookingSystem
                     {
                         loggedInUser = user;
                         user.LastLogin = DateTime.Now;
-                        await firebaseService.UpdateUserAsync(user.Id ?? "", user);
+
+                        // Safety check: Only update if user has valid ID
+                        if (!string.IsNullOrEmpty(user.Id))
+                        {
+                            await firebaseService.UpdateUserAsync(user.Id, user);
+                        }
                     }
                 }
 
