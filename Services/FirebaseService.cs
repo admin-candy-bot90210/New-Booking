@@ -325,8 +325,46 @@ namespace DJBookingSystem.Services
                 Timestamp = m.Object.Timestamp,
                 IsErrorMessage = m.Object.IsErrorMessage,
                 ErrorCode = m.Object.ErrorCode,
-                Type = m.Object.Type
+                Type = m.Object.Type,
+                Channel = m.Object.Channel,
+                RecipientUsername = m.Object.RecipientUsername,
+                GroupMembers = m.Object.GroupMembers ?? new List<string>(),
+                GroupName = m.Object.GroupName,
+                IsRead = m.Object.IsRead,
+                ReadAt = m.Object.ReadAt
             }).OrderBy(m => m.Timestamp).ToList();
+        }
+
+        // Get user chat settings
+        public async Task<UserChatSettings?> GetUserChatSettingsAsync(string username)
+        {
+            try
+            {
+                var settings = await _firebaseClient
+                    .Child("chat_settings")
+                    .Child(username)
+                    .OnceSingleAsync<UserChatSettings>();
+
+                if (settings != null)
+                {
+                    settings.Username = username;
+                }
+
+                return settings;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        // Update user chat settings
+        public async Task UpdateUserChatSettingsAsync(UserChatSettings settings)
+        {
+            await _firebaseClient
+                .Child("chat_settings")
+                .Child(settings.Username)
+                .PutAsync(settings);
         }
 
         // Log error to chat (automatically sent to SysAdmin)
