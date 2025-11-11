@@ -14,6 +14,10 @@ namespace DJBookingSystem.Models
         public string? ErrorCode { get; set; }
         public MessageType Type { get; set; } = MessageType.Normal;
 
+        // Sender identity flags for color coding
+        public bool SenderIsDJ { get; set; } = false;
+        public bool SenderIsVenueOwner { get; set; } = false;
+
         // Channel and targeting
         public ChatChannel Channel { get; set; } = ChatChannel.World;
         public string? RecipientUsername { get; set; } // For private 1-on-1 messages
@@ -61,5 +65,28 @@ namespace DJBookingSystem.Models
         public DateTime Timestamp { get; set; } = DateTime.Now;
         public ChatChannel Channel { get; set; } = ChatChannel.World;
         public bool IsRead { get; set; } = false;
+    }
+
+    public class UserReport
+    {
+        public string? Id { get; set; }
+        public string ReportedUsername { get; set; } = string.Empty;
+        public string ReporterUsername { get; set; } = string.Empty;
+        public string Reason { get; set; } = string.Empty;
+        public string Details { get; set; } = string.Empty;
+        public DateTime ReportedAt { get; set; } = DateTime.Now;
+        public bool IsResolved { get; set; } = false;
+        public string? ResolvedBy { get; set; }
+        public DateTime? ResolvedAt { get; set; }
+        public string? AdminNotes { get; set; }
+    }
+
+    public enum ReportReason
+    {
+        Harassment,
+        Spam,
+        InappropriateContent,
+        Impersonation,
+        Other
     }
 }

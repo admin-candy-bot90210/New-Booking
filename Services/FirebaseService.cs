@@ -321,6 +321,8 @@ namespace DJBookingSystem.Services
                 Id = m.Key,
                 SenderUsername = m.Object.SenderUsername,
                 SenderRole = m.Object.SenderRole,
+                SenderIsDJ = m.Object.SenderIsDJ,
+                SenderIsVenueOwner = m.Object.SenderIsVenueOwner,
                 Message = m.Object.Message,
                 Timestamp = m.Object.Timestamp,
                 IsErrorMessage = m.Object.IsErrorMessage,
@@ -365,6 +367,47 @@ namespace DJBookingSystem.Services
                 .Child("chat_settings")
                 .Child(settings.Username)
                 .PutAsync(settings);
+        }
+
+        // Add user report
+        public async Task<string> AddUserReportAsync(UserReport report)
+        {
+            var result = await _firebaseClient
+                .Child("user_reports")
+                .PostAsync(report);
+
+            return result.Key;
+        }
+
+        // Get all user reports (for admin review)
+        public async Task<List<UserReport>> GetAllUserReportsAsync()
+        {
+            var reports = await _firebaseClient
+                .Child("user_reports")
+                .OnceAsync<UserReport>();
+
+            return reports.Select(r => new UserReport
+            {
+                Id = r.Key,
+                ReportedUsername = r.Object.ReportedUsername,
+                ReporterUsername = r.Object.ReporterUsername,
+                Reason = r.Object.Reason,
+                Details = r.Object.Details,
+                ReportedAt = r.Object.ReportedAt,
+                IsResolved = r.Object.IsResolved,
+                ResolvedBy = r.Object.ResolvedBy,
+                ResolvedAt = r.Object.ResolvedAt,
+                AdminNotes = r.Object.AdminNotes
+            }).OrderByDescending(r => r.ReportedAt).ToList();
+        }
+
+        // Update user report (for admin resolution)
+        public async Task UpdateUserReportAsync(string id, UserReport report)
+        {
+            await _firebaseClient
+                .Child("user_reports")
+                .Child(id)
+                .PutAsync(report);
         }
 
         // Log error to chat (automatically sent to SysAdmin)

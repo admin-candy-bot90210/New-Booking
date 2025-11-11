@@ -371,6 +371,8 @@ namespace DJBookingSystem
                 {
                     SenderUsername = _currentUser.Username,
                     SenderRole = _currentUser.Role.ToString(),
+                    SenderIsDJ = _currentUser.IsDJ,
+                    SenderIsVenueOwner = _currentUser.IsVenueOwner,
                     Message = messageText,
                     Timestamp = DateTime.Now,
                     IsErrorMessage = false,
@@ -518,6 +520,110 @@ namespace DJBookingSystem
 
             dialog.Content = panel;
             dialog.ShowDialog();
+        }
+
+        private async void ReportUser_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is string username)
+            {
+                // Create report dialog
+                var dialog = new Window
+                {
+                    Title = $"Report User: {username}",
+                    Width = 400,
+                    Height = 450,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = this
+                };
+
+                var panel = new StackPanel { Margin = new Thickness(15) };
+
+                // Header
+                panel.Children.Add(new TextBlock
+                {
+                    Text = $"Report {username} to administrators",
+                    FontSize = 14,
+                    FontWeight = FontWeights.Bold,
+                    Margin = new Thickness(0, 0, 0, 15)
+                });
+
+                // Reason selection
+                panel.Children.Add(new TextBlock { Text = "Reason:", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 0, 5) });
+                var reasonComboBox = new ComboBox { Margin = new Thickness(0, 0, 0, 15) };
+                reasonComboBox.Items.Add("Harassment");
+                reasonComboBox.Items.Add("Spam");
+                reasonComboBox.Items.Add("Inappropriate Content");
+                reasonComboBox.Items.Add("Impersonation");
+                reasonComboBox.Items.Add("Other");
+                reasonComboBox.SelectedIndex = 0;
+                panel.Children.Add(reasonComboBox);
+
+                // Details
+                panel.Children.Add(new TextBlock { Text = "Details (optional):", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 0, 5) });
+                var detailsTextBox = new TextBox
+                {
+                    TextWrapping = TextWrapping.Wrap,
+                    AcceptsReturn = true,
+                    Height = 120,
+                    Margin = new Thickness(0, 0, 0, 15),
+                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+                };
+                panel.Children.Add(detailsTextBox);
+
+                // Buttons
+                var buttonPanel = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+
+                var submitButton = new Button
+                {
+                    Content = "Submit Report",
+                    Padding = new Thickness(15, 8, 15, 8),
+                    Margin = new Thickness(0, 0, 10, 0),
+                    Background = new SolidColorBrush(Color.FromRgb(231, 76, 60)),
+                    Foreground = new SolidColorBrush(Colors.White),
+                    BorderThickness = new Thickness(0)
+                };
+                submitButton.Click += async (s, args) =>
+                {
+                    var report = new UserReport
+                    {
+                        ReportedUsername = username,
+                        ReporterUsername = _currentUser.Username,
+                        Reason = reasonComboBox.SelectedItem?.ToString() ?? "Other",
+                        Details = detailsTextBox.Text.Trim(),
+                        ReportedAt = DateTime.Now,
+                        IsResolved = false
+                    };
+
+                    try
+                    {
+                        await _firebaseService.AddUserReportAsync(report);
+                        dialog.Close();
+                        MessageBox.Show($"Thank you. Your report about {username} has been submitted to the administrators.",
+                            "Report Submitted", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Failed to submit report: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                };
+
+                var cancelButton = new Button
+                {
+                    Content = "Cancel",
+                    Padding = new Thickness(15, 8, 15, 8),
+                    Background = new SolidColorBrush(Color.FromRgb(149, 165, 166)),
+                    Foreground = new SolidColorBrush(Colors.White),
+                    BorderThickness = new Thickness(0)
+                };
+                cancelButton.Click += (s, args) => dialog.Close();
+
+                buttonPanel.Children.Add(submitButton);
+                buttonPanel.Children.Add(cancelButton);
+                panel.Children.Add(buttonPanel);
+
+                dialog.Content = panel;
+                dialog.ShowDialog();
+            }
         }
 
         #endregion
