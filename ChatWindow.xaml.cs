@@ -23,6 +23,7 @@ namespace DJBookingSystem
         private DispatcherTimer _refreshTimer;
         private System.Windows.Forms.NotifyIcon? _notifyIcon;
         private bool _isMinimizedToTray = false;
+        public bool IsModerator { get; set; }
 
         public ChatWindow(FirebaseService firebaseService, User currentUser, bool stayOnTop = false)
         {
@@ -30,8 +31,15 @@ namespace DJBookingSystem
             _firebaseService = firebaseService;
             _currentUser = currentUser;
 
+            // Set DataContext for binding
+            this.DataContext = this;
+
             // Apply Stay on Top preference
             this.Topmost = stayOnTop;
+
+            // Check if user is a moderator
+            IsModerator = (_currentUser.Role == UserRole.SysAdmin || _currentUser.Role == UserRole.Manager) &&
+                          (_currentUser.Permissions.CanBanUsers || _currentUser.Permissions.CanMuteUsers);
 
             // Initialize chat settings
             LoadChatSettings();
@@ -40,6 +48,7 @@ namespace DJBookingSystem
             if (_currentUser.Role == UserRole.SysAdmin || _currentUser.Role == UserRole.Manager)
             {
                 AdminOnlyChannelButton.Visibility = Visibility.Visible;
+                ModerationButton.Visibility = Visibility.Visible;
             }
 
             // Show stats panel only for SysAdmin
@@ -355,6 +364,34 @@ namespace DJBookingSystem
                 return;
             }
 
+            // Check if user is banned
+            if (_currentUser.IsBanned)
+            {
+                string banMessage = "Your account has been banned and you cannot send messages.";
+                if (_currentUser.BanExpiry.HasValue)
+                {
+                    banMessage += $"\nBan expires: {_currentUser.BanExpiry.Value:MMM dd, yyyy HH:mm}";
+                }
+                if (!string.IsNullOrEmpty(_currentUser.BanReason))
+                {
+                    banMessage += $"\nReason: {_currentUser.BanReason}";
+                }
+                MessageBox.Show(banMessage, "Account Banned", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Check if user is globally muted
+            if (_currentUser.IsGloballyMuted)
+            {
+                string muteMessage = "You have been muted by a moderator and cannot send messages.";
+                if (_currentUser.MuteExpiry.HasValue)
+                {
+                    muteMessage += $"\nMute expires: {_currentUser.MuteExpiry.Value:MMM dd, yyyy HH:mm}";
+                }
+                MessageBox.Show(muteMessage, "Muted", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             // Check if channel requires admin permissions
             if (_currentChannel == ChatChannel.AdminOnly &&
                 _currentUser.Role != UserRole.SysAdmin &&
@@ -624,6 +661,307 @@ namespace DJBookingSystem
                 dialog.Content = panel;
                 dialog.ShowDialog();
             }
+        }
+
+        private async void BanUser_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is string username)
+            {
+                // Check if current user has permission
+                if (!_currentUser.Permissions.CanBanUsers)
+                {
+                    MessageBox.Show("You don't have permission to ban users.", "Permission Denied",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // Create ban dialog
+                var dialog = new Window
+                {
+                    Title = $"Ban User: {username}",
+                    Width = 450,
+                    Height = 400,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = this
+                };
+
+                var panel = new StackPanel { Margin = new Thickness(15) };
+
+                // Header
+                panel.Children.Add(new TextBlock
+                {
+                    Text = $"Ban {username} from the system",
+                    FontSize = 14,
+                    FontWeight = FontWeights.Bold,
+                    Margin = new Thickness(0, 0, 0, 15),
+                    Foreground = new SolidColorBrush(Color.FromRgb(192, 57, 43))
+                });
+
+                // Duration selection
+                panel.Children.Add(new TextBlock { Text = "Ban Duration:", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 0, 5) });
+                var durationComboBox = new ComboBox { Margin = new Thickness(0, 0, 0, 15) };
+                durationComboBox.Items.Add("1 Hour");
+                durationComboBox.Items.Add("24 Hours");
+                durationComboBox.Items.Add("7 Days");
+                durationComboBox.Items.Add("30 Days");
+                durationComboBox.Items.Add("Permanent");
+                durationComboBox.SelectedIndex = 2; // Default to 7 days
+                panel.Children.Add(durationComboBox);
+
+                // Reason
+                panel.Children.Add(new TextBlock { Text = "Reason:", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 0, 5) });
+                var reasonTextBox = new TextBox
+                {
+                    TextWrapping = TextWrapping.Wrap,
+                    AcceptsReturn = true,
+                    Height = 80,
+                    Margin = new Thickness(0, 0, 0, 15),
+                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+                };
+                panel.Children.Add(reasonTextBox);
+
+                // Warning
+                panel.Children.Add(new TextBlock
+                {
+                    Text = "⚠️ The user will be logged out and unable to access the system.",
+                    FontStyle = FontStyles.Italic,
+                    Foreground = new SolidColorBrush(Color.FromRgb(192, 57, 43)),
+                    Margin = new Thickness(0, 0, 0, 15),
+                    TextWrapping = TextWrapping.Wrap
+                });
+
+                // Buttons
+                var buttonPanel = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+
+                var banButton = new Button
+                {
+                    Content = "🚷 Ban User",
+                    Padding = new Thickness(15, 8, 15, 8),
+                    Margin = new Thickness(0, 0, 10, 0),
+                    Background = new SolidColorBrush(Color.FromRgb(192, 57, 43)),
+                    Foreground = new SolidColorBrush(Colors.White),
+                    BorderThickness = new Thickness(0)
+                };
+                banButton.Click += async (s, args) =>
+                {
+                    if (string.IsNullOrWhiteSpace(reasonTextBox.Text))
+                    {
+                        MessageBox.Show("Please provide a reason for the ban.", "Reason Required",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    DateTime? expiryDate = null;
+                    string duration = durationComboBox.SelectedItem?.ToString() ?? "7 Days";
+
+                    if (duration != "Permanent")
+                    {
+                        expiryDate = duration switch
+                        {
+                            "1 Hour" => DateTime.Now.AddHours(1),
+                            "24 Hours" => DateTime.Now.AddDays(1),
+                            "7 Days" => DateTime.Now.AddDays(7),
+                            "30 Days" => DateTime.Now.AddDays(30),
+                            _ => DateTime.Now.AddDays(7)
+                        };
+                    }
+
+                    try
+                    {
+                        await _firebaseService.BanUserAsync(username, _currentUser.Username, reasonTextBox.Text.Trim(), expiryDate);
+                        dialog.Close();
+
+                        string banMsg = $"{username} has been banned.";
+                        if (expiryDate.HasValue)
+                        {
+                            banMsg += $"\nBan expires: {expiryDate.Value:MMM dd, yyyy HH:mm}";
+                        }
+                        else
+                        {
+                            banMsg += "\nThis is a permanent ban.";
+                        }
+
+                        MessageBox.Show(banMsg, "User Banned", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LoadOnlineUsers();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Failed to ban user: {ex.Message}", "Error",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                };
+
+                var cancelButton = new Button
+                {
+                    Content = "Cancel",
+                    Padding = new Thickness(15, 8, 15, 8),
+                    Background = new SolidColorBrush(Color.FromRgb(149, 165, 166)),
+                    Foreground = new SolidColorBrush(Colors.White),
+                    BorderThickness = new Thickness(0)
+                };
+                cancelButton.Click += (s, args) => dialog.Close();
+
+                buttonPanel.Children.Add(banButton);
+                buttonPanel.Children.Add(cancelButton);
+                panel.Children.Add(buttonPanel);
+
+                dialog.Content = panel;
+                dialog.ShowDialog();
+            }
+        }
+
+        private async void ModMuteUser_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is string username)
+            {
+                // Check if current user has permission
+                if (!_currentUser.Permissions.CanMuteUsers)
+                {
+                    MessageBox.Show("You don't have permission to mute users.", "Permission Denied",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // Create mute dialog
+                var dialog = new Window
+                {
+                    Title = $"Mute User: {username}",
+                    Width = 450,
+                    Height = 380,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = this
+                };
+
+                var panel = new StackPanel { Margin = new Thickness(15) };
+
+                // Header
+                panel.Children.Add(new TextBlock
+                {
+                    Text = $"Mute {username} in all chat channels",
+                    FontSize = 14,
+                    FontWeight = FontWeights.Bold,
+                    Margin = new Thickness(0, 0, 0, 15),
+                    Foreground = new SolidColorBrush(Color.FromRgb(142, 68, 173))
+                });
+
+                // Duration selection
+                panel.Children.Add(new TextBlock { Text = "Mute Duration:", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 0, 5) });
+                var durationComboBox = new ComboBox { Margin = new Thickness(0, 0, 0, 15) };
+                durationComboBox.Items.Add("30 Minutes");
+                durationComboBox.Items.Add("1 Hour");
+                durationComboBox.Items.Add("24 Hours");
+                durationComboBox.Items.Add("7 Days");
+                durationComboBox.Items.Add("Permanent");
+                durationComboBox.SelectedIndex = 2; // Default to 24 hours
+                panel.Children.Add(durationComboBox);
+
+                // Reason
+                panel.Children.Add(new TextBlock { Text = "Reason:", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 0, 5) });
+                var reasonTextBox = new TextBox
+                {
+                    TextWrapping = TextWrapping.Wrap,
+                    AcceptsReturn = true,
+                    Height = 80,
+                    Margin = new Thickness(0, 0, 0, 15),
+                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+                };
+                panel.Children.Add(reasonTextBox);
+
+                // Info
+                panel.Children.Add(new TextBlock
+                {
+                    Text = "ℹ️ The user will be unable to send messages in any chat channel.",
+                    FontStyle = FontStyles.Italic,
+                    Foreground = new SolidColorBrush(Color.FromRgb(142, 68, 173)),
+                    Margin = new Thickness(0, 0, 0, 15),
+                    TextWrapping = TextWrapping.Wrap
+                });
+
+                // Buttons
+                var buttonPanel = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+
+                var muteButton = new Button
+                {
+                    Content = "🔇 Mute User",
+                    Padding = new Thickness(15, 8, 15, 8),
+                    Margin = new Thickness(0, 0, 10, 0),
+                    Background = new SolidColorBrush(Color.FromRgb(142, 68, 173)),
+                    Foreground = new SolidColorBrush(Colors.White),
+                    BorderThickness = new Thickness(0)
+                };
+                muteButton.Click += async (s, args) =>
+                {
+                    if (string.IsNullOrWhiteSpace(reasonTextBox.Text))
+                    {
+                        MessageBox.Show("Please provide a reason for the mute.", "Reason Required",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    DateTime? expiryDate = null;
+                    string duration = durationComboBox.SelectedItem?.ToString() ?? "24 Hours";
+
+                    if (duration != "Permanent")
+                    {
+                        expiryDate = duration switch
+                        {
+                            "30 Minutes" => DateTime.Now.AddMinutes(30),
+                            "1 Hour" => DateTime.Now.AddHours(1),
+                            "24 Hours" => DateTime.Now.AddDays(1),
+                            "7 Days" => DateTime.Now.AddDays(7),
+                            _ => DateTime.Now.AddDays(1)
+                        };
+                    }
+
+                    try
+                    {
+                        await _firebaseService.MuteUserAsync(username, _currentUser.Username, reasonTextBox.Text.Trim(), expiryDate);
+                        dialog.Close();
+
+                        string muteMsg = $"{username} has been muted.";
+                        if (expiryDate.HasValue)
+                        {
+                            muteMsg += $"\nMute expires: {expiryDate.Value:MMM dd, yyyy HH:mm}";
+                        }
+                        else
+                        {
+                            muteMsg += "\nThis is a permanent mute.";
+                        }
+
+                        MessageBox.Show(muteMsg, "User Muted", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LoadOnlineUsers();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Failed to mute user: {ex.Message}", "Error",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                };
+
+                var cancelButton = new Button
+                {
+                    Content = "Cancel",
+                    Padding = new Thickness(15, 8, 15, 8),
+                    Background = new SolidColorBrush(Color.FromRgb(149, 165, 166)),
+                    Foreground = new SolidColorBrush(Colors.White),
+                    BorderThickness = new Thickness(0)
+                };
+                cancelButton.Click += (s, args) => dialog.Close();
+
+                buttonPanel.Children.Add(muteButton);
+                buttonPanel.Children.Add(cancelButton);
+                panel.Children.Add(buttonPanel);
+
+                dialog.Content = panel;
+                dialog.ShowDialog();
+            }
+        }
+
+        private void Moderation_Click(object sender, RoutedEventArgs e)
+        {
+            var moderationWindow = new ModerationWindow(_firebaseService, _currentUser);
+            moderationWindow.Owner = this;
+            moderationWindow.ShowDialog();
         }
 
         #endregion

@@ -70,6 +70,56 @@ namespace DJBookingSystem
                     return;
                 }
 
+                // Check if user is banned
+                if (user.IsBanned)
+                {
+                    string banMessage = "Your account has been banned.";
+                    if (user.BanExpiry.HasValue)
+                    {
+                        if (user.BanExpiry.Value > DateTime.Now)
+                        {
+                            banMessage = $"Your account is temporarily banned until {user.BanExpiry.Value:MMM dd, yyyy HH:mm}.";
+                        }
+                        else
+                        {
+                            // Ban expired, automatically unban
+                            user.IsBanned = false;
+                            user.BannedBy = null;
+                            user.BannedAt = null;
+                            user.BanReason = null;
+                            user.BanExpiry = null;
+                            if (!string.IsNullOrEmpty(user.Id))
+                            {
+                                await _firebaseService.UpdateUserAsync(user.Id, user);
+                            }
+                        }
+                    }
+
+                    if (user.IsBanned)
+                    {
+                        if (!string.IsNullOrEmpty(user.BanReason))
+                        {
+                            banMessage += $"\n\nReason: {user.BanReason}";
+                        }
+                        banMessage += "\n\nPlease contact an administrator if you believe this is a mistake.";
+                        ShowError(banMessage);
+                        return;
+                    }
+                }
+
+                // Check if mute expired and clear it
+                if (user.IsGloballyMuted && user.MuteExpiry.HasValue && user.MuteExpiry.Value <= DateTime.Now)
+                {
+                    user.IsGloballyMuted = false;
+                    user.MutedBy = null;
+                    user.MutedAt = null;
+                    user.MuteExpiry = null;
+                    if (!string.IsNullOrEmpty(user.Id))
+                    {
+                        await _firebaseService.UpdateUserAsync(user.Id, user);
+                    }
+                }
+
                 // Verify password
                 string passwordHash = HashPassword(password);
                 if (user.PasswordHash != passwordHash)

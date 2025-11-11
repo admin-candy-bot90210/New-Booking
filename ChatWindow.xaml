@@ -182,6 +182,16 @@
                                Foreground="White"
                                BorderThickness="0"
                                Cursor="Hand"/>
+                        <Button x:Name="ModerationButton"
+                               Content="🛡️ Moderation"
+                               Click="Moderation_Click"
+                               Padding="10,5"
+                               Margin="5,0"
+                               Background="#C0392B"
+                               Foreground="White"
+                               BorderThickness="0"
+                               Cursor="Hand"
+                               Visibility="Collapsed"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -418,6 +428,29 @@
                                                    Foreground="White"
                                                    BorderThickness="0"
                                                    Cursor="Hand"/>
+                                            <!-- Moderator-only buttons -->
+                                            <Button Content="🚷"
+                                                   ToolTip="Ban User"
+                                                   Click="BanUser_Click"
+                                                   Tag="{Binding Username}"
+                                                   Padding="4,2"
+                                                   FontSize="12"
+                                                   Background="#C0392B"
+                                                   Foreground="White"
+                                                   BorderThickness="0"
+                                                   Cursor="Hand"
+                                                   Visibility="{Binding DataContext.IsModerator, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                            <Button Content="🔇"
+                                                   ToolTip="Moderator Mute"
+                                                   Click="ModMuteUser_Click"
+                                                   Tag="{Binding Username}"
+                                                   Padding="4,2"
+                                                   FontSize="12"
+                                                   Background="#8E44AD"
+                                                   Foreground="White"
+                                                   BorderThickness="0"
+                                                   Cursor="Hand"
+                                                   Visibility="{Binding DataContext.IsModerator, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                         </StackPanel>
                                     </Grid>
                                 </Border>

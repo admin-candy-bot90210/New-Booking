@@ -89,4 +89,28 @@ namespace DJBookingSystem.Models
         Impersonation,
         Other
     }
+
+    public class ModerationAction
+    {
+        public string? Id { get; set; }
+        public string TargetUsername { get; set; } = string.Empty;
+        public string ModeratorUsername { get; set; } = string.Empty;
+        public ModerationActionType ActionType { get; set; }
+        public string Reason { get; set; } = string.Empty;
+        public DateTime ActionDate { get; set; } = DateTime.Now;
+        public DateTime? ExpiryDate { get; set; } // For temporary bans/mutes
+        public bool IsActive { get; set; } = true;
+        public DateTime? RevokedAt { get; set; }
+        public string? RevokedBy { get; set; }
+    }
+
+    public enum ModerationActionType
+    {
+        Ban,
+        Unban,
+        Mute,
+        Unmute,
+        Warning,
+        ReportResolved
+    }
 }

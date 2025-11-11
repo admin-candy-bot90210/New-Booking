@@ -25,6 +25,18 @@ namespace DJBookingSystem.Models
 
         // User App Preferences
         public UserAppPreferences AppPreferences { get; set; } = new UserAppPreferences();
+
+        // Moderation fields
+        public bool IsBanned { get; set; } = false;
+        public string? BannedBy { get; set; } // Username of moderator who banned
+        public DateTime? BannedAt { get; set; }
+        public string? BanReason { get; set; }
+        public DateTime? BanExpiry { get; set; } // Null = permanent ban
+
+        public bool IsGloballyMuted { get; set; } = false; // Moderator mute (can't send messages)
+        public string? MutedBy { get; set; } // Username of moderator who muted
+        public DateTime? MutedAt { get; set; }
+        public DateTime? MuteExpiry { get; set; } // Null = permanent mute
     }
 
     public class UserAppPreferences
@@ -78,6 +90,12 @@ namespace DJBookingSystem.Models
         public bool CanManageUsers { get; set; } = false;
         public bool CanCustomizeApp { get; set; } = false;
         public bool CanAccessSettings { get; set; } = true;
+
+        // Moderation permissions
+        public bool CanBanUsers { get; set; } = false;
+        public bool CanMuteUsers { get; set; } = false;
+        public bool CanViewReports { get; set; } = false;
+        public bool CanResolveReports { get; set; } = false;
 
         // RadioBOSS permissions
         public bool CanViewRadioBoss { get; set; } = false;

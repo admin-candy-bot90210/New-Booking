@@ -251,7 +251,11 @@ namespace DJBookingSystem.Services
                             CanCustomizeApp = true,
                             CanAccessSettings = true,
                             CanViewRadioBoss = true,
-                            CanControlRadioBoss = true
+                            CanControlRadioBoss = true,
+                            CanBanUsers = true,
+                            CanMuteUsers = true,
+                            CanViewReports = true,
+                            CanResolveReports = true
                         },
                         IsActive = true,
                         CreatedAt = DateTime.Now
@@ -408,6 +412,166 @@ namespace DJBookingSystem.Services
                 .Child("user_reports")
                 .Child(id)
                 .PutAsync(report);
+        }
+
+        // MODERATION MANAGEMENT
+
+        // Ban user
+        public async Task BanUserAsync(string username, string moderatorUsername, string reason, DateTime? expiryDate = null)
+        {
+            var user = await GetUserByUsernameAsync(username);
+            if (user == null) return;
+
+            user.IsBanned = true;
+            user.BannedBy = moderatorUsername;
+            user.BannedAt = DateTime.Now;
+            user.BanReason = reason;
+            user.BanExpiry = expiryDate;
+
+            await UpdateUserAsync(user.Id!, user);
+
+            // Log moderation action
+            var action = new ModerationAction
+            {
+                TargetUsername = username,
+                ModeratorUsername = moderatorUsername,
+                ActionType = ModerationActionType.Ban,
+                Reason = reason,
+                ActionDate = DateTime.Now,
+                ExpiryDate = expiryDate,
+                IsActive = true
+            };
+            await AddModerationActionAsync(action);
+        }
+
+        // Unban user
+        public async Task UnbanUserAsync(string username, string moderatorUsername)
+        {
+            var user = await GetUserByUsernameAsync(username);
+            if (user == null) return;
+
+            user.IsBanned = false;
+            user.BannedBy = null;
+            user.BannedAt = null;
+            user.BanReason = null;
+            user.BanExpiry = null;
+
+            await UpdateUserAsync(user.Id!, user);
+
+            // Log moderation action
+            var action = new ModerationAction
+            {
+                TargetUsername = username,
+                ModeratorUsername = moderatorUsername,
+                ActionType = ModerationActionType.Unban,
+                Reason = "Ban lifted",
+                ActionDate = DateTime.Now,
+                IsActive = true
+            };
+            await AddModerationActionAsync(action);
+        }
+
+        // Mute user
+        public async Task MuteUserAsync(string username, string moderatorUsername, string reason, DateTime? expiryDate = null)
+        {
+            var user = await GetUserByUsernameAsync(username);
+            if (user == null) return;
+
+            user.IsGloballyMuted = true;
+            user.MutedBy = moderatorUsername;
+            user.MutedAt = DateTime.Now;
+            user.MuteExpiry = expiryDate;
+
+            await UpdateUserAsync(user.Id!, user);
+
+            // Log moderation action
+            var action = new ModerationAction
+            {
+                TargetUsername = username,
+                ModeratorUsername = moderatorUsername,
+                ActionType = ModerationActionType.Mute,
+                Reason = reason,
+                ActionDate = DateTime.Now,
+                ExpiryDate = expiryDate,
+                IsActive = true
+            };
+            await AddModerationActionAsync(action);
+        }
+
+        // Unmute user
+        public async Task UnmuteUserAsync(string username, string moderatorUsername)
+        {
+            var user = await GetUserByUsernameAsync(username);
+            if (user == null) return;
+
+            user.IsGloballyMuted = false;
+            user.MutedBy = null;
+            user.MutedAt = null;
+            user.MuteExpiry = null;
+
+            await UpdateUserAsync(user.Id!, user);
+
+            // Log moderation action
+            var action = new ModerationAction
+            {
+                TargetUsername = username,
+                ModeratorUsername = moderatorUsername,
+                ActionType = ModerationActionType.Unmute,
+                Reason = "Mute lifted",
+                ActionDate = DateTime.Now,
+                IsActive = true
+            };
+            await AddModerationActionAsync(action);
+        }
+
+        // Add moderation action to log
+        public async Task<string> AddModerationActionAsync(ModerationAction action)
+        {
+            var result = await _firebaseClient
+                .Child("moderation_actions")
+                .PostAsync(action);
+
+            return result.Key;
+        }
+
+        // Get moderation history for a user
+        public async Task<List<ModerationAction>> GetModerationHistoryForUserAsync(string username)
+        {
+            var actions = await _firebaseClient
+                .Child("moderation_actions")
+                .OnceAsync<ModerationAction>();
+
+            return actions
+                .Select(a => new ModerationAction
+                {
+                    Id = a.Key,
+                    TargetUsername = a.Object.TargetUsername,
+                    ModeratorUsername = a.Object.ModeratorUsername,
+                    ActionType = a.Object.ActionType,
+                    Reason = a.Object.Reason,
+                    ActionDate = a.Object.ActionDate,
+                    ExpiryDate = a.Object.ExpiryDate,
+                    IsActive = a.Object.IsActive,
+                    RevokedAt = a.Object.RevokedAt,
+                    RevokedBy = a.Object.RevokedBy
+                })
+                .Where(a => a.TargetUsername == username)
+                .OrderByDescending(a => a.ActionDate)
+                .ToList();
+        }
+
+        // Get all banned users
+        public async Task<List<User>> GetBannedUsersAsync()
+        {
+            var users = await GetAllUsersAsync();
+            return users.Where(u => u.IsBanned).ToList();
+        }
+
+        // Get all muted users
+        public async Task<List<User>> GetMutedUsersAsync()
+        {
+            var users = await GetAllUsersAsync();
+            return users.Where(u => u.IsGloballyMuted).ToList();
         }
 
         // Log error to chat (automatically sent to SysAdmin)
