@@ -28,6 +28,7 @@ namespace DJBookingSystem
             ApplyPermissions();
             ApplyUserPreferences();
             InitializeTimeControls();
+            AutoFillDJInfo();
         }
 
         private void ApplyUserPreferences()
@@ -142,6 +143,32 @@ namespace DJBookingSystem
 
             // Each DJ slot is 1 hour - minute is always :00
             MinuteComboBox.Items.Add("00");
+        }
+
+        private void AutoFillDJInfo()
+        {
+            // Auto-fill DJ information from user profile if they are a DJ
+            if (_currentUser.IsDJ)
+            {
+                try
+                {
+                    // Pre-fill DJ Name with username
+                    if (DJNameTextBox != null)
+                    {
+                        DJNameTextBox.Text = _currentUser.Username;
+                    }
+
+                    // Pre-fill Streaming Link from profile if available
+                    if (StreamingLinkTextBox != null && !string.IsNullOrEmpty(_currentUser.StreamingLink))
+                    {
+                        StreamingLinkTextBox.Text = _currentUser.StreamingLink;
+                    }
+                }
+                catch
+                {
+                    // Silently fail if controls don't exist yet
+                }
+            }
         }
 
 
@@ -269,6 +296,9 @@ namespace DJBookingSystem
             BookingDatePicker.SelectedDate = null;
             HourComboBox.SelectedIndex = 18; // Default to 6 PM
             MinuteComboBox.SelectedIndex = 0; // Default to :00
+
+            // Re-fill DJ info from profile for next booking
+            AutoFillDJInfo();
         }
 
         // Refresh bookings list

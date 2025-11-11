@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -19,26 +20,48 @@ namespace DJBookingSystem
             _firebaseService = firebaseService;
         }
 
+        private void AccountTypeChanged(object sender, RoutedEventArgs e)
+        {
+            // Hide/show descriptions based on selection
+            bool isDJChecked = IsDJCheckBox.IsChecked ?? false;
+            bool isVenueOwnerChecked = IsVenueOwnerCheckBox.IsChecked ?? false;
+
+            // Hide DJ description when checked
+            DJDescription.Visibility = isDJChecked ? Visibility.Collapsed : Visibility.Visible;
+
+            // Hide Venue Owner description when checked
+            VenueOwnerDescription.Visibility = isVenueOwnerChecked ? Visibility.Collapsed : Visibility.Visible;
+
+            // Show DJ-specific fields only if DJ is checked
+            DJFieldsPanel.Visibility = isDJChecked ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void OpenPostImages_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Open PostImages.org in default browser
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "https://postimages.org/",
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to open PostImages.org: {ex.Message}\n\nPlease manually visit: https://postimages.org/",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
         private async void Register_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Validation
-                if (string.IsNullOrWhiteSpace(FullNameTextBox.Text))
-                {
-                    MessageBox.Show("Please enter your full name.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
+                // Basic validation
                 if (string.IsNullOrWhiteSpace(UsernameTextBox.Text))
                 {
-                    MessageBox.Show("Please enter a username.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(EmailTextBox.Text) || !EmailTextBox.Text.Contains("@"))
-                {
-                    MessageBox.Show("Please enter a valid email address.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Please enter a username (DJ name).", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -63,6 +86,38 @@ namespace DJBookingSystem
                     return;
                 }
 
+                // DJ-specific validation
+                if (isDJ)
+                {
+                    if (string.IsNullOrWhiteSpace(StreamingLinkTextBox.Text))
+                    {
+                        MessageBox.Show("Please enter your streaming link URL.\n\nThis is required for DJ accounts.",
+                            "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    // Basic URL validation for streaming link
+                    if (!StreamingLinkTextBox.Text.Trim().StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                        !StreamingLinkTextBox.Text.Trim().StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                    {
+                        MessageBox.Show("Streaming link must be a valid URL starting with http:// or https://",
+                            "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    // Optional: Validate DJ Logo URL if provided
+                    if (!string.IsNullOrWhiteSpace(DJLogoUrlTextBox.Text))
+                    {
+                        if (!DJLogoUrlTextBox.Text.Trim().StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                            !DJLogoUrlTextBox.Text.Trim().StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                        {
+                            MessageBox.Show("DJ Logo URL must be a valid URL starting with http:// or https://",
+                                "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            return;
+                        }
+                    }
+                }
+
                 if (AgreeTermsCheckBox.IsChecked != true)
                 {
                     MessageBox.Show("Please agree to the Terms of Service and Privacy Policy.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -82,11 +137,13 @@ namespace DJBookingSystem
                 {
                     Username = UsernameTextBox.Text.Trim(),
                     PasswordHash = HashPassword(PasswordBox.Password),
-                    FullName = FullNameTextBox.Text.Trim(),
-                    Email = EmailTextBox.Text.Trim(),
+                    FullName = UsernameTextBox.Text.Trim(), // Use username as display name
+                    Email = "", // Not collected
                     Role = UserRole.User, // Default role
                     IsDJ = isDJ,
                     IsVenueOwner = isVenueOwner,
+                    StreamingLink = isDJ ? StreamingLinkTextBox.Text.Trim() : "",
+                    DJLogoUrl = isDJ ? DJLogoUrlTextBox.Text.Trim() : "",
                     Permissions = GetDefaultPermissionsForAccountType(isDJ, isVenueOwner),
                     IsActive = true,
                     CreatedAt = DateTime.Now
@@ -98,7 +155,16 @@ namespace DJBookingSystem
 
                 RegisteredUser = newUser;
 
-                MessageBox.Show($"Registration successful!\n\nWelcome, {newUser.FullName}!\n\nYou can now log in with your credentials.",
+                // Auto-save login info to local storage for easier access
+                LocalStorage.SaveLoginInfo(newUser.Username, rememberMe: true, autoLogin: false);
+
+                string accountTypes = isDJ && isVenueOwner ? "DJ and Venue Owner" :
+                                     isDJ ? "DJ" : "Venue Owner";
+
+                MessageBox.Show($"Registration successful!\n\n" +
+                    $"Welcome, {newUser.Username}!\n" +
+                    $"Account Type: {accountTypes}\n\n" +
+                    $"You can now log in with your credentials.",
                     "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 DialogResult = true;

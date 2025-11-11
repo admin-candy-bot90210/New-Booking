@@ -19,6 +19,10 @@ namespace DJBookingSystem.Models
         public bool IsDJ { get; set; } = false;
         public bool IsVenueOwner { get; set; } = false;
 
+        // DJ-specific information (stored on profile for auto-fill during booking)
+        public string StreamingLink { get; set; } = string.Empty;
+        public string DJLogoUrl { get; set; } = string.Empty;
+
         // User App Preferences
         public UserAppPreferences AppPreferences { get; set; } = new UserAppPreferences();
     }
