@@ -301,6 +301,73 @@
                     </StackPanel>
                 </Border>
 
+                <!-- Credits & Development -->
+                <Border Background="#27AE60" Padding="20" Margin="0,0,0,10" CornerRadius="5">
+                    <StackPanel>
+                        <TextBlock Text="8. CREDITS &amp; DEVELOPMENT" FontSize="20" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Created By:" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10" Foreground="White">
+                            <Run Text="Shane (gunnerysarge_ on Discord)" FontWeight="Bold"/>
+                            <LineBreak/>
+                            <Run Text="From: Mega Byte I.T Services"/>
+                        </TextBlock>
+
+                        <TextBlock Text="In Conjunction With:" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10" Foreground="White">
+                            <Run Text="The Fallen Collective"/>
+                            <LineBreak/>
+                            <Run Text="LivePartyMusic.fm - "/>
+                            <Hyperlink NavigateUri="https://livepartymusic.fm" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#FFE4CC">
+                                <Run Text="https://livepartymusic.fm"/>
+                            </Hyperlink>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Privacy & Legal -->
+                <Border Background="#E74C3C" Padding="20" Margin="0,0,0,10" CornerRadius="5">
+                    <StackPanel>
+                        <TextBlock Text="9. PRIVACY &amp; LEGAL AGREEMENT" FontSize="20" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Ownership:" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10" Foreground="White">
+                            <Run Text="This DJ Booking System software is the exclusive property of LivePartyMusic.fm. All rights reserved."/>
+                        </TextBlock>
+
+                        <TextBlock Text="Restrictions:" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10" Foreground="White">
+                            <Run Text="• This software may NOT be reverse engineered, decompiled, or disassembled"/>
+                            <LineBreak/>
+                            <Run Text="• This software may NOT be modified, adapted, or used to create derivative works"/>
+                            <LineBreak/>
+                            <Run Text="• This software may NOT be redistributed, sold, or transferred without written permission"/>
+                            <LineBreak/>
+                            <Run Text="• Unauthorized copying or distribution is strictly prohibited"/>
+                        </TextBlock>
+
+                        <TextBlock Text="Usage:" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10" Foreground="White">
+                            <Run Text="• This software is provided 'as-is' without warranty of any kind"/>
+                            <LineBreak/>
+                            <Run Text="• Usage is permitted only for authorized LivePartyMusic.fm operations"/>
+                            <LineBreak/>
+                            <Run Text="• By using this software, you agree to these terms and conditions"/>
+                        </TextBlock>
+
+                        <TextBlock Text="Data Privacy:" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10" Foreground="White">
+                            <Run Text="• User data is stored securely in Firebase"/>
+                            <LineBreak/>
+                            <Run Text="• All communications are internal to the system"/>
+                            <LineBreak/>
+                            <Run Text="• No user data is shared with third parties"/>
+                            <LineBreak/>
+                            <Run Text="• Passwords are hashed and never stored in plain text"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
                 <!-- Version Info -->
                 <Border Background="#3498DB" Padding="15" CornerRadius="5">
                     <StackPanel>
@@ -308,11 +375,16 @@
                                   FontSize="12"
                                   Foreground="White"
                                   HorizontalAlignment="Center"/>
-                        <TextBlock Text="© 2024 - All Rights Reserved"
+                        <TextBlock Text="© 2024 LivePartyMusic.fm - All Rights Reserved"
                                   FontSize="10"
                                   Foreground="White"
                                   HorizontalAlignment="Center"
                                   Margin="0,5,0,0"/>
+                        <TextBlock Text="Created by Shane (Mega Byte I.T Services)"
+                                  FontSize="9"
+                                  Foreground="White"
+                                  HorizontalAlignment="Center"
+                                  Margin="0,3,0,0"/>
                     </StackPanel>
                 </Border>
             </StackPanel>

@@ -405,7 +405,8 @@ namespace DJBookingSystem
         {
             if (BookingsDataGrid.SelectedItem is Booking booking)
             {
-                var editWindow = new EditBookingWindow(booking, _allVenues.Where(v => v.IsOpen).ToList());
+                bool stayOnTop = _currentUser.AppPreferences?.StayOnTop ?? false;
+                var editWindow = new EditBookingWindow(booking, _allVenues.Where(v => v.IsOpen).ToList(), stayOnTop);
                 if (editWindow.ShowDialog() == true && _firebaseService != null)
                 {
                     try
@@ -508,7 +509,8 @@ namespace DJBookingSystem
                 return;
             }
 
-            var registrationWindow = new VenueRegistrationWindow(_currentUser.Username);
+            bool stayOnTop = _currentUser.AppPreferences?.StayOnTop ?? false;
+            var registrationWindow = new VenueRegistrationWindow(_currentUser.Username, stayOnTop);
             if (registrationWindow.ShowDialog() == true && registrationWindow.RegisteredVenue != null)
             {
                 try
@@ -594,7 +596,8 @@ namespace DJBookingSystem
             {
                 try
                 {
-                    var scheduleWindow = new VenueDailyScheduleWindow(_firebaseService, venue);
+                    bool stayOnTop = _currentUser.AppPreferences?.StayOnTop ?? false;
+                    var scheduleWindow = new VenueDailyScheduleWindow(_firebaseService, venue, stayOnTop);
                     scheduleWindow.Show();
                 }
                 catch (Exception ex)
@@ -648,7 +651,8 @@ namespace DJBookingSystem
         {
             if (_firebaseService != null)
             {
-                var userManagementWindow = new UserManagementWindow(_firebaseService);
+                bool stayOnTop = _currentUser.AppPreferences?.StayOnTop ?? false;
+                var userManagementWindow = new UserManagementWindow(_firebaseService, stayOnTop);
                 userManagementWindow.ShowDialog();
             }
         }
@@ -665,7 +669,8 @@ namespace DJBookingSystem
         {
             try
             {
-                var radioBossControl = new RadioBossControlWindow();
+                bool stayOnTop = _currentUser.AppPreferences?.StayOnTop ?? false;
+                var radioBossControl = new RadioBossControlWindow(stayOnTop);
                 radioBossControl.Show();
             }
             catch (Exception ex)
@@ -678,7 +683,8 @@ namespace DJBookingSystem
         {
             try
             {
-                var radioBossBrowser = new RadioBossBrowserWindow();
+                bool stayOnTop = _currentUser.AppPreferences?.StayOnTop ?? false;
+                var radioBossBrowser = new RadioBossBrowserWindow(stayOnTop);
                 radioBossBrowser.Show();
             }
             catch (Exception ex)
@@ -737,7 +743,8 @@ namespace DJBookingSystem
             {
                 try
                 {
-                    var chatWindow = new ChatWindow(_firebaseService, _currentUser);
+                    bool stayOnTop = _currentUser.AppPreferences?.StayOnTop ?? false;
+                    var chatWindow = new ChatWindow(_firebaseService, _currentUser, stayOnTop);
                     chatWindow.Show();
                 }
                 catch (Exception ex)
@@ -756,7 +763,8 @@ namespace DJBookingSystem
             {
                 try
                 {
-                    var radioPlayer = new RadioPlayerWindow(_firebaseService, _currentUser);
+                    bool stayOnTop = _currentUser.AppPreferences?.StayOnTop ?? false;
+                    var radioPlayer = new RadioPlayerWindow(_firebaseService, _currentUser, stayOnTop);
                     radioPlayer.Show();
                 }
                 catch (Exception ex)
@@ -773,7 +781,8 @@ namespace DJBookingSystem
         {
             try
             {
-                var helpWindow = new HelpGuideWindow();
+                bool stayOnTop = _currentUser.AppPreferences?.StayOnTop ?? false;
+                var helpWindow = new HelpGuideWindow(stayOnTop);
                 helpWindow.Show();
             }
             catch (Exception ex)

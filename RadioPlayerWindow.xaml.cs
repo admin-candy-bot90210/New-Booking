@@ -16,11 +16,14 @@ namespace DJBookingSystem
         private MediaFoundationReader? _mediaReader;
         private List<RadioStation> _savedStations = new List<RadioStation>();
 
-        public RadioPlayerWindow(FirebaseService firebaseService, User currentUser)
+        public RadioPlayerWindow(FirebaseService firebaseService, User currentUser, bool stayOnTop = false)
         {
             InitializeComponent();
             _firebaseService = firebaseService;
             _currentUser = currentUser;
+
+            // Apply Stay on Top preference
+            this.Topmost = stayOnTop;
 
             LoadSavedStations();
         }

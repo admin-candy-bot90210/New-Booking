@@ -12,16 +12,19 @@ namespace DJBookingSystem
         public bool IsNewUser { get; private set; }
 
         // Constructor for new user
-        public EditUserWindow()
+        public EditUserWindow(bool stayOnTop = false)
         {
             InitializeComponent();
             IsNewUser = true;
             TitleTextBlock.Text = "Add New User";
             PasswordHintTextBlock.Visibility = Visibility.Collapsed;
+
+            // Apply Stay on Top preference
+            this.Topmost = stayOnTop;
         }
 
         // Constructor for editing existing user
-        public EditUserWindow(User user)
+        public EditUserWindow(User user, bool stayOnTop = false)
         {
             InitializeComponent();
             IsNewUser = false;
@@ -29,6 +32,9 @@ namespace DJBookingSystem
             TitleTextBlock.Text = "Edit User";
             PasswordLabel.Text = "New Password: (optional)";
             PasswordHintTextBlock.Visibility = Visibility.Visible;
+
+            // Apply Stay on Top preference
+            this.Topmost = stayOnTop;
 
             LoadUserData();
         }

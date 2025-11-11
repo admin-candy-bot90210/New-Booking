@@ -8,11 +8,14 @@ namespace DJBookingSystem
         private User _user;
         public UserPermissions? UpdatedPermissions { get; private set; }
 
-        public EditPermissionsWindow(User user)
+        public EditPermissionsWindow(User user, bool stayOnTop = false)
         {
             InitializeComponent();
             _user = user;
             UserInfoTextBlock.Text = $"User: {user.Username} ({user.FullName})";
+
+            // Apply Stay on Top preference
+            this.Topmost = stayOnTop;
 
             LoadPermissions();
         }

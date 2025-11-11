@@ -12,9 +12,13 @@ namespace DJBookingSystem
         private const string Password = "Remote";
         private bool _isInitialized = false;
 
-        public RadioBossBrowserWindow()
+        public RadioBossBrowserWindow(bool stayOnTop = false)
         {
             InitializeComponent();
+
+            // Apply Stay on Top preference
+            this.Topmost = stayOnTop;
+
             InitializeWebView();
         }
 

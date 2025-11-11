@@ -15,11 +15,14 @@ namespace DJBookingSystem
         private List<ChatMessage> _allMessages = new List<ChatMessage>();
         private bool _showErrorsOnly = false;
 
-        public ChatWindow(FirebaseService firebaseService, User currentUser)
+        public ChatWindow(FirebaseService firebaseService, User currentUser, bool stayOnTop = false)
         {
             InitializeComponent();
             _firebaseService = firebaseService;
             _currentUser = currentUser;
+
+            // Apply Stay on Top preference
+            this.Topmost = stayOnTop;
 
             // Show stats panel only for SysAdmin
             if (_currentUser.Role == UserRole.SysAdmin)

@@ -8,11 +8,16 @@ namespace DJBookingSystem
     public partial class RadioBossControlWindow : Window
     {
         private readonly RadioBossService _radioBossService;
+        private readonly bool _stayOnTop = false;
 
-        public RadioBossControlWindow()
+        public RadioBossControlWindow(bool stayOnTop = false)
         {
             InitializeComponent();
             _radioBossService = new RadioBossService();
+            _stayOnTop = stayOnTop;
+
+            // Apply Stay on Top preference
+            this.Topmost = stayOnTop;
 
             // Auto-load status on startup
             Loaded += async (s, e) => await RefreshStatusAsync();
@@ -148,7 +153,7 @@ namespace DJBookingSystem
         {
             try
             {
-                var browserWindow = new RadioBossBrowserWindow();
+                var browserWindow = new RadioBossBrowserWindow(_stayOnTop);
                 browserWindow.Show();
             }
             catch (Exception ex)

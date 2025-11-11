@@ -13,12 +13,15 @@ namespace DJBookingSystem
         private List<Venue> _venues;
         public Booking UpdatedBooking { get; private set; }
 
-        public EditBookingWindow(Booking booking, List<Venue> venues)
+        public EditBookingWindow(Booking booking, List<Venue> venues, bool stayOnTop = false)
         {
             InitializeComponent();
             _originalBooking = booking;
             _venues = venues;
             UpdatedBooking = new Booking();
+
+            // Apply Stay on Top preference
+            this.Topmost = stayOnTop;
 
             InitializeTimeControls();
             LoadBookingData();

@@ -11,11 +11,17 @@ namespace DJBookingSystem
     {
         private FirebaseService _firebaseService;
         private List<User> _users = new List<User>();
+        private bool _stayOnTop = false;
 
-        public UserManagementWindow(FirebaseService firebaseService)
+        public UserManagementWindow(FirebaseService firebaseService, bool stayOnTop = false)
         {
             InitializeComponent();
             _firebaseService = firebaseService;
+            _stayOnTop = stayOnTop;
+
+            // Apply Stay on Top preference
+            this.Topmost = stayOnTop;
+
             LoadUsers();
         }
 
@@ -34,7 +40,7 @@ namespace DJBookingSystem
 
         private async void AddUser_Click(object sender, RoutedEventArgs e)
         {
-            var editWindow = new EditUserWindow();
+            var editWindow = new EditUserWindow(_stayOnTop);
             if (editWindow.ShowDialog() == true && editWindow.UpdatedUser != null)
             {
                 try
@@ -69,7 +75,7 @@ namespace DJBookingSystem
                     return;
                 }
 
-                var editWindow = new EditUserWindow(user);
+                var editWindow = new EditUserWindow(user, _stayOnTop);
                 if (editWindow.ShowDialog() == true && editWindow.UpdatedUser != null)
                 {
                     try
@@ -101,7 +107,7 @@ namespace DJBookingSystem
                     return;
                 }
 
-                var permWindow = new EditPermissionsWindow(user);
+                var permWindow = new EditPermissionsWindow(user, _stayOnTop);
                 if (permWindow.ShowDialog() == true && permWindow.UpdatedPermissions != null)
                 {
                     try
@@ -134,7 +140,7 @@ namespace DJBookingSystem
                     return;
                 }
 
-                var detailedPermWindow = new DetailedPermissionsWindow(user);
+                var detailedPermWindow = new DetailedPermissionsWindow(user, _stayOnTop);
                 if (detailedPermWindow.ShowDialog() == true && detailedPermWindow.UpdatedPermissions != null)
                 {
                     try

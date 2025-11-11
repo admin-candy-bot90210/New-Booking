@@ -9,10 +9,13 @@ namespace DJBookingSystem
         public Venue? RegisteredVenue { get; private set; }
         private string _ownerUsername;
 
-        public VenueRegistrationWindow(string ownerUsername)
+        public VenueRegistrationWindow(string ownerUsername, bool stayOnTop = false)
         {
             InitializeComponent();
             _ownerUsername = ownerUsername;
+
+            // Apply Stay on Top preference
+            this.Topmost = stayOnTop;
         }
 
         private void RegisterVenue_Click(object sender, RoutedEventArgs e)

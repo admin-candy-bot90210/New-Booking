@@ -14,12 +14,15 @@ namespace DJBookingSystem
         private List<Booking> _allBookings = new List<Booking>();
         private DateTime _selectedDate;
 
-        public VenueDailyScheduleWindow(FirebaseService firebaseService, Venue venue)
+        public VenueDailyScheduleWindow(FirebaseService firebaseService, Venue venue, bool stayOnTop = false)
         {
             InitializeComponent();
             _firebaseService = firebaseService;
             _venue = venue;
             _selectedDate = DateTime.Today;
+
+            // Apply Stay on Top preference
+            this.Topmost = stayOnTop;
 
             VenueNameTextBlock.Text = $"Daily Schedule - {_venue.RoomName}";
             ScheduleDatePicker.SelectedDate = _selectedDate;
