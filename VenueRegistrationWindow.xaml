@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Register Your Room/Venue" Height="550" Width="600"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize">
+        ResizeMode="CanResize">
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -59,6 +59,14 @@
                                 AcceptsReturn="True"
                                 VerticalScrollBarVisibility="Auto"/>
                         <TextBlock Text="Example: Mon-Fri: 6PM-2AM, Sat-Sun: 8PM-4AM"
+                                  FontSize="11"
+                                  FontStyle="Italic"
+                                  Foreground="Gray"
+                                  Margin="0,2,0,0"/>
+
+                        <TextBlock Text="Discord Webhook URL: (Optional)" Margin="0,15,0,2"/>
+                        <TextBox x:Name="DiscordWebhookTextBox" Padding="5"/>
+                        <TextBlock Text="Enter a Discord webhook URL to receive booking notifications in your channel"
                                   FontSize="11"
                                   FontStyle="Italic"
                                   Foreground="Gray"

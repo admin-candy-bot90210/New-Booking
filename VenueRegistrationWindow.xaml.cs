@@ -7,10 +7,12 @@ namespace DJBookingSystem
     public partial class VenueRegistrationWindow : Window
     {
         public Venue? RegisteredVenue { get; private set; }
+        private string _ownerUsername;
 
-        public VenueRegistrationWindow()
+        public VenueRegistrationWindow(string ownerUsername)
         {
             InitializeComponent();
+            _ownerUsername = ownerUsername;
         }
 
         private void RegisterVenue_Click(object sender, RoutedEventArgs e)
@@ -43,6 +45,20 @@ namespace DJBookingSystem
                 return;
             }
 
+            // Validate Discord webhook if provided
+            string discordWebhook = DiscordWebhookTextBox.Text.Trim();
+            if (!string.IsNullOrEmpty(discordWebhook))
+            {
+                if (!discordWebhook.StartsWith("https://discord.com/api/webhooks/") &&
+                    !discordWebhook.StartsWith("https://discordapp.com/api/webhooks/"))
+                {
+                    MessageBox.Show("Invalid Discord webhook URL. It should start with https://discord.com/api/webhooks/",
+                        "Invalid Webhook", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    DiscordWebhookTextBox.Focus();
+                    return;
+                }
+            }
+
             // Create the venue object
             RegisteredVenue = new Venue
             {
@@ -50,7 +66,9 @@ namespace DJBookingSystem
                 RoomDescription = RoomDescriptionTextBox.Text.Trim(),
                 OpeningHours = OpeningHoursTextBox.Text.Trim(),
                 IsOpen = true,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                DiscordWebhookUrl = discordWebhook,
+                OwnerUsername = _ownerUsername
             };
 
             DialogResult = true;

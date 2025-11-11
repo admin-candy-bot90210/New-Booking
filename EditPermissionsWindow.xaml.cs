@@ -38,6 +38,10 @@ namespace DJBookingSystem
             CanManageUsersCheckBox.IsChecked = perms.CanManageUsers;
             CanCustomizeAppCheckBox.IsChecked = perms.CanCustomizeApp;
             CanAccessSettingsCheckBox.IsChecked = perms.CanAccessSettings;
+
+            // RadioBOSS permissions
+            CanViewRadioBossCheckBox.IsChecked = perms.CanViewRadioBoss;
+            CanControlRadioBossCheckBox.IsChecked = perms.CanControlRadioBoss;
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -60,7 +64,11 @@ namespace DJBookingSystem
                 // Admin permissions
                 CanManageUsers = CanManageUsersCheckBox.IsChecked ?? false,
                 CanCustomizeApp = CanCustomizeAppCheckBox.IsChecked ?? false,
-                CanAccessSettings = CanAccessSettingsCheckBox.IsChecked ?? false
+                CanAccessSettings = CanAccessSettingsCheckBox.IsChecked ?? false,
+
+                // RadioBOSS permissions
+                CanViewRadioBoss = CanViewRadioBossCheckBox.IsChecked ?? false,
+                CanControlRadioBoss = CanControlRadioBossCheckBox.IsChecked ?? false
             };
 
             DialogResult = true;

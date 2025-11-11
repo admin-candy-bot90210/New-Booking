@@ -9,6 +9,8 @@ namespace DJBookingSystem
         public FirebaseUrlWindow()
         {
             InitializeComponent();
+            // Set default Firebase URL
+            FirebaseUrlTextBox.Text = "https://new-booking-system-46908-default-rtdb.firebaseio.com/";
         }
 
         private void Connect_Click(object sender, RoutedEventArgs e)

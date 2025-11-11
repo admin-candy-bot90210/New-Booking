@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DJ Booking System - Live Stream & Book Your Gigs</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>🎵 DJ Booking System</h1>
+                <p>Live DJ Streams & Free Venue Bookings</p>
+            </div>
+            <nav class="nav">
+                <a href="#stream">Live Stream</a>
+                <a href="#bookings">Today's Schedule</a>
+                <a href="#venues">Venues</a>
+                <a href="#about">About</a>
+                <a href="#" class="btn-login" onclick="openDesktopApp()">Login to App</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>Experience Live DJ Sets 24/7</h2>
+            <p>Free DJ services for venues | Book your slot now</p>
+            <div class="hero-buttons">
+                <a href="#bookings" class="btn btn-primary">View Schedule</a>
+                <a href="#" onclick="openDesktopApp()" class="btn btn-secondary">Download DJ App</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Stream Player Section -->
+    <section id="stream" class="stream-section">
+        <div class="container">
+            <h2>🔴 Now Playing</h2>
+            <div class="player-card">
+                <div class="now-playing">
+                    <div class="dj-info">
+                        <h3 id="currentDJ">Loading DJ...</h3>
+                        <p id="currentVenue">Loading venue...</p>
+                        <p id="currentTime">--:-- - --:--</p>
+                    </div>
+                    <div class="player-controls">
+                        <audio id="audioPlayer" controls>
+                            <source id="audioSource" src="" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <div class="stream-url-input">
+                            <input type="text" id="streamUrl" placeholder="Enter custom stream URL...">
+                            <button onclick="loadCustomStream()">Load Stream</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="liveListeners">0</span>
+                        <span class="stat-label">Live Listeners</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="todayBookings">0</span>
+                        <span class="stat-label">Today's DJs</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalVenues">0</span>
+                        <span class="stat-label">Active Venues</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Today's Schedule -->
+    <section id="bookings" class="schedule-section">
+        <div class="container">
+            <h2>📅 Today's DJ Schedule</h2>
+            <div class="schedule-filter">
+                <select id="venueFilter" onchange="filterSchedule()">
+                    <option value="all">All Venues</option>
+                </select>
+            </div>
+            <div id="scheduleList" class="schedule-list">
+                <p class="loading">Loading schedule...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Venues Section -->
+    <section id="venues" class="venues-section">
+        <div class="container">
+            <h2>🏢 Available Venues</h2>
+            <div id="venuesList" class="venues-grid">
+                <p class="loading">Loading venues...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2>About DJ Booking System</h2>
+            <div class="about-content">
+                <div class="about-card">
+                    <h3>🎧 For DJs</h3>
+                    <p>Book free 1-hour slots at venues across the network. Stream your sets live and build your audience.</p>
+                    <ul>
+                        <li>Free venue access</li>
+                        <li>Live streaming support</li>
+                        <li>Easy booking system</li>
+                        <li>Professional venues</li>
+                    </ul>
+                </div>
+                <div class="about-card">
+                    <h3>🏢 For Venues</h3>
+                    <p>Offer your space to talented DJs for free. Get live entertainment and build your community.</p>
+                    <ul>
+                        <li>Free DJ services</li>
+                        <li>Schedule management</li>
+                        <li>Discord notifications</li>
+                        <li>Automated bookings</li>
+                    </ul>
+                </div>
+                <div class="about-card">
+                    <h3>🎵 For Listeners</h3>
+                    <p>Enjoy live DJ sets 24/7 from venues around the world. Discover new music and artists.</p>
+                    <ul>
+                        <li>24/7 live streams</li>
+                        <li>Multiple venues</li>
+                        <li>Diverse music styles</li>
+                        <li>Free access</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>DJ Booking System</h4>
+                    <p>Connecting DJs, venues, and music lovers worldwide.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="#stream">Live Stream</a>
+                    <a href="#bookings">Schedule</a>
+                    <a href="#venues">Venues</a>
+                    <a href="#" onclick="openDesktopApp()">Desktop App</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>Email: info@djbooking.com</p>
+                    <p>Support: support@djbooking.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 DJ Booking System. All rights reserved.</p>
+                <p>🤖 Built with Claude Code</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

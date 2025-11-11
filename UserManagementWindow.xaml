@@ -52,6 +52,12 @@
                    Margin="5"
                    Background="#3498DB"
                    Foreground="White"/>
+            <Button Content="Detailed Permissions"
+                   Click="DetailedPermissions_Click"
+                   Padding="15,5"
+                   Margin="5"
+                   Background="#E67E22"
+                   Foreground="White"/>
             <Button Content="Toggle Active/Inactive"
                    Click="ToggleActive_Click"
                    Padding="15,5"

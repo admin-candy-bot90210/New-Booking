@@ -151,7 +151,9 @@ namespace DJBookingSystem
                         CanToggleVenueStatus = true,
                         CanManageUsers = true,
                         CanCustomizeApp = true,
-                        CanAccessSettings = true
+                        CanAccessSettings = true,
+                        CanViewRadioBoss = true,
+                        CanControlRadioBoss = true
                     };
 
                 case UserRole.Manager:
@@ -168,7 +170,9 @@ namespace DJBookingSystem
                         CanToggleVenueStatus = true,
                         CanManageUsers = false,
                         CanCustomizeApp = false,
-                        CanAccessSettings = true
+                        CanAccessSettings = true,
+                        CanViewRadioBoss = false,
+                        CanControlRadioBoss = false
                     };
 
                 case UserRole.User:
@@ -186,7 +190,9 @@ namespace DJBookingSystem
                         CanToggleVenueStatus = false,
                         CanManageUsers = false,
                         CanCustomizeApp = false,
-                        CanAccessSettings = true
+                        CanAccessSettings = true,
+                        CanViewRadioBoss = false,
+                        CanControlRadioBoss = false
                     };
             }
         }

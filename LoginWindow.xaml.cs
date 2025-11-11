@@ -16,6 +16,14 @@ namespace DJBookingSystem
         {
             InitializeComponent();
             _firebaseService = firebaseService;
+
+            // Load saved login info
+            var loginInfo = LocalStorage.GetLoginInfo();
+            if (loginInfo != null && loginInfo.RememberMe)
+            {
+                UsernameTextBox.Text = loginInfo.Username;
+                RememberMeCheckBox.IsChecked = true;
+            }
         }
 
         private async void Login_Click(object sender, RoutedEventArgs e)
@@ -67,6 +75,11 @@ namespace DJBookingSystem
                 user.LastLogin = DateTime.Now;
                 await _firebaseService.UpdateUserAsync(user.Id ?? "", user);
 
+                // Save login info if Remember Me is checked
+                bool rememberMe = RememberMeCheckBox.IsChecked ?? false;
+                bool autoLogin = user.AppPreferences?.AutoLogin ?? false;
+                LocalStorage.SaveLoginInfo(username, rememberMe, autoLogin);
+
                 // Login successful
                 LoggedInUser = user;
                 DialogResult = true;
@@ -75,6 +88,24 @@ namespace DJBookingSystem
             catch (Exception ex)
             {
                 ShowError($"Login failed: {ex.Message}");
+            }
+        }
+
+        private void Register_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var registrationWindow = new RegistrationWindow(_firebaseService);
+                if (registrationWindow.ShowDialog() == true && registrationWindow.RegisteredUser != null)
+                {
+                    // Auto-fill username after successful registration
+                    UsernameTextBox.Text = registrationWindow.RegisteredUser.Username;
+                    PasswordBox.Focus();
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Failed to open registration: {ex.Message}");
             }
         }
 

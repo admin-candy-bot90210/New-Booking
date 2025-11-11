@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using DJBookingSystem.Models;
 using DJBookingSystem.Services;
+using DJBookingSystem.ViewModels;
 
 namespace DJBookingSystem
 {
@@ -25,7 +26,18 @@ namespace DJBookingSystem
 
             ApplySettings();
             ApplyPermissions();
+            ApplyUserPreferences();
             InitializeTimeControls();
+        }
+
+        private void ApplyUserPreferences()
+        {
+            // Apply StayOnTop preference
+            if (_currentUser.AppPreferences != null)
+            {
+                this.Topmost = _currentUser.AppPreferences.StayOnTop;
+                StayOnTopMenuItem.IsChecked = _currentUser.AppPreferences.StayOnTop;
+            }
         }
 
         private void ApplySettings()
@@ -60,8 +72,8 @@ namespace DJBookingSystem
             if (!perms.CanViewVenues)
                 ManageVenuesTab.Visibility = Visibility.Collapsed;
 
-            // Show admin tab only for users with manage users permission
-            if (perms.CanManageUsers || perms.CanCustomizeApp)
+            // Show admin tab only for users with manage users, customize, or radioboss permission
+            if (perms.CanManageUsers || perms.CanCustomizeApp || perms.CanViewRadioBoss)
                 AdminTab.Visibility = Visibility.Visible;
             else
                 AdminTab.Visibility = Visibility.Collapsed;
@@ -97,6 +109,24 @@ namespace DJBookingSystem
                 if (!perms.CanToggleVenueStatus)
                 {
                     ToggleVenueButton.IsEnabled = false;
+                }
+
+                // RadioBOSS permissions
+                if (!perms.CanViewRadioBoss)
+                {
+                    RadioBossSectionHeader.Visibility = Visibility.Collapsed;
+                    RadioBossControlButton.Visibility = Visibility.Collapsed;
+                    RadioBossWebButton.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    // User can view, check if they can control
+                    if (!perms.CanControlRadioBoss)
+                    {
+                        // Show buttons but disable the control panel (view-only through web interface)
+                        RadioBossControlButton.IsEnabled = false;
+                        RadioBossControlButton.ToolTip = "You do not have permission to control RadioBOSS";
+                    }
                 }
             }
             catch { }
@@ -145,16 +175,35 @@ namespace DJBookingSystem
                     .AddHours(hour)
                     .AddMinutes(minute);
 
+                var selectedVenue = (Venue)VenueComboBox.SelectedItem;
                 var booking = new Booking
                 {
                     DJName = DJNameTextBox.Text.Trim(),
                     StreamingLink = StreamingLinkTextBox.Text.Trim(),
-                    Venue = ((Venue)VenueComboBox.SelectedItem).RoomName,
+                    Venue = selectedVenue.RoomName,
                     BookingDate = bookingDateTime,
                     CreatedAt = DateTime.Now
                 };
 
                 string bookingId = await _firebaseService.AddBookingAsync(booking);
+
+                // Send Discord notification if webhook is configured
+                if (!string.IsNullOrEmpty(selectedVenue.DiscordWebhookUrl))
+                {
+                    // Calculate available slots for the day
+                    var allBookings = await _firebaseService.GetAllBookingsAsync();
+                    var dayBookings = allBookings.Count(b =>
+                        b.Venue == selectedVenue.RoomName &&
+                        b.BookingDate.Date == bookingDateTime.Date);
+                    int availableSlots = Math.Max(0, 24 - dayBookings); // Assuming 24 one-hour slots per day
+
+                    _ = DiscordService.SendBookingNotificationAsync(
+                        selectedVenue.DiscordWebhookUrl,
+                        booking.DJName,
+                        selectedVenue.RoomName,
+                        bookingDateTime,
+                        availableSlots);
+                }
 
                 MessageBox.Show($"DJ Booking added successfully! ID: {bookingId}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -218,7 +267,8 @@ namespace DJBookingSystem
         {
             if (VenueFilterComboBox.SelectedItem == null)
             {
-                BookingsDataGrid.ItemsSource = _allBookings;
+                var viewModels = _allBookings.Select(b => BookingViewModel.FromBooking(b, _currentUser, _allVenues)).ToList();
+                BookingsDataGrid.ItemsSource = viewModels;
                 return;
             }
 
@@ -226,11 +276,14 @@ namespace DJBookingSystem
 
             if (selectedVenue == "All Venues")
             {
-                BookingsDataGrid.ItemsSource = _allBookings;
+                var viewModels = _allBookings.Select(b => BookingViewModel.FromBooking(b, _currentUser, _allVenues)).ToList();
+                BookingsDataGrid.ItemsSource = viewModels;
             }
             else
             {
-                BookingsDataGrid.ItemsSource = _allBookings.Where(b => b.Venue == selectedVenue).ToList();
+                var filtered = _allBookings.Where(b => b.Venue == selectedVenue).ToList();
+                var viewModels = filtered.Select(b => BookingViewModel.FromBooking(b, _currentUser, _allVenues)).ToList();
+                BookingsDataGrid.ItemsSource = viewModels;
             }
         }
 
@@ -362,7 +415,7 @@ namespace DJBookingSystem
                 return;
             }
 
-            var registrationWindow = new VenueRegistrationWindow();
+            var registrationWindow = new VenueRegistrationWindow(_currentUser.Username);
             if (registrationWindow.ShowDialog() == true && registrationWindow.RegisteredVenue != null)
             {
                 try
@@ -441,6 +494,30 @@ namespace DJBookingSystem
             }
         }
 
+        // View Daily Schedule for venue
+        private void ViewDailySchedule_Click(object sender, RoutedEventArgs e)
+        {
+            if (VenuesDataGrid.SelectedItem is Venue venue && _firebaseService != null)
+            {
+                try
+                {
+                    var scheduleWindow = new VenueDailyScheduleWindow(_firebaseService, venue);
+                    scheduleWindow.Show();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to open daily schedule: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                    // Log error to SysAdmin
+                    _ = _firebaseService.LogErrorToChatAsync(ex.Message, "SCHEDULE001", _currentUser.Username);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a venue to view the daily schedule.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
         // Delete venue
         private async void DeleteVenue_Click(object sender, RoutedEventArgs e)
         {
@@ -487,6 +564,156 @@ namespace DJBookingSystem
         {
             MessageBox.Show("App customization feature coming soon!\n\nThis will allow you to:\n- Change theme colors\n- Toggle features on/off\n- Customize text and labels",
                 "Customize App", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        // RADIOBOSS CONTROL HANDLERS
+
+        private void OpenRadioBossControl_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var radioBossControl = new RadioBossControlWindow();
+                radioBossControl.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to open RadioBOSS control panel: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void OpenRadioBossWeb_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var radioBossBrowser = new RadioBossBrowserWindow();
+                radioBossBrowser.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to open RadioBOSS web interface: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // MENU HANDLERS
+
+        private void Logout_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to logout?", "Logout", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                Application.Current.Shutdown();
+            }
+        }
+
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        private async void MySettings_Click(object sender, RoutedEventArgs e)
+        {
+            if (_firebaseService != null)
+            {
+                var settingsWindow = new UserSettingsWindow(_currentUser, _firebaseService);
+                if (settingsWindow.ShowDialog() == true && settingsWindow.SettingsChanged)
+                {
+                    // Reload user preferences
+                    var updatedUser = await _firebaseService.GetUserByUsernameAsync(_currentUser.Username);
+                    if (updatedUser != null)
+                    {
+                        _currentUser = updatedUser;
+                        ApplyUserPreferences();
+                    }
+                }
+            }
+        }
+
+        private void StayOnTop_Checked(object sender, RoutedEventArgs e)
+        {
+            this.Topmost = true;
+        }
+
+        private void StayOnTop_Unchecked(object sender, RoutedEventArgs e)
+        {
+            this.Topmost = false;
+        }
+
+        private void Chat_Click(object sender, RoutedEventArgs e)
+        {
+            if (_firebaseService != null)
+            {
+                try
+                {
+                    var chatWindow = new ChatWindow(_firebaseService, _currentUser);
+                    chatWindow.Show();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to open chat: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                    // Log error to Firebase for SysAdmin
+                    _ = _firebaseService.LogErrorToChatAsync(ex.Message, "CHAT001", _currentUser.Username);
+                }
+            }
+        }
+
+        private void RadioPlayer_Click(object sender, RoutedEventArgs e)
+        {
+            if (_firebaseService != null)
+            {
+                try
+                {
+                    var radioPlayer = new RadioPlayerWindow(_firebaseService, _currentUser);
+                    radioPlayer.Show();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to open radio player: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                    // Log error to Firebase for SysAdmin
+                    _ = _firebaseService.LogErrorToChatAsync(ex.Message, "RADIO003", _currentUser.Username);
+                }
+            }
+        }
+
+        private void HelpGuide_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var helpWindow = new HelpGuideWindow();
+                helpWindow.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to open help guide: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                // Log error to Firebase for SysAdmin
+                if (_firebaseService != null)
+                {
+                    _ = _firebaseService.LogErrorToChatAsync(ex.Message, "HELP001", _currentUser.Username);
+                }
+            }
+        }
+
+        private void About_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(
+                "DJ Booking Management System\n\n" +
+                "Version 2.0\n\n" +
+                "Features:\n" +
+                "• DJ Booking Management\n" +
+                "• Venue Registration & Management\n" +
+                "• User Authentication & Permissions\n" +
+                "• RadioBOSS Cloud Integration\n" +
+                "• Chat & Communication\n" +
+                "• Customizable Themes\n" +
+                "• Firebase Realtime Database\n" +
+                "• Error Logging to SysAdmin\n\n" +
+                "All DJ services are FREE!\n\n" +
+                "🤖 Built with Claude Code",
+                "About",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
         }
     }
 }

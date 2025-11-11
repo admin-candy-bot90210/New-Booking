@@ -1,0 +1,333 @@
+<Window x:Class="DJBookingSystem.HelpGuideWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DJ Booking System - Help Guide" Height="700" Width="900"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize"
+        Background="#ECF0F1">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#2C3E50" Padding="20">
+            <StackPanel>
+                <TextBlock Text="DJ Booking System - Help Guide"
+                          FontSize="24"
+                          FontWeight="Bold"
+                          Foreground="White"
+                          HorizontalAlignment="Center"/>
+                <TextBlock Text="Complete User Manual and Documentation"
+                          FontSize="12"
+                          Foreground="#ECF0F1"
+                          HorizontalAlignment="Center"
+                          Margin="0,5,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="20">
+            <StackPanel>
+                <!-- Getting Started -->
+                <Border Background="White" Padding="20" Margin="0,0,0,10" CornerRadius="5">
+                    <StackPanel>
+                        <TextBlock Text="1. GETTING STARTED" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Login Information:" FontSize="14" FontWeight="Bold" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,5">
+                            <Run Text="• Default SysAdmin Username: "/>
+                            <Run Text="SysAdmin" FontWeight="Bold"/>
+                            <LineBreak/>
+                            <Run Text="• Default SysAdmin Password: "/>
+                            <Run Text="Fraser1960@" FontWeight="Bold"/>
+                            <LineBreak/>
+                            <Run Text="• Standard Admin Username: "/>
+                            <Run Text="admin" FontWeight="Bold"/>
+                            <LineBreak/>
+                            <Run Text="• Standard Admin Password: "/>
+                            <Run Text="admin123" FontWeight="Bold"/>
+                        </TextBlock>
+
+                        <TextBlock Text="First Time Setup:" FontSize="14" FontWeight="Bold" Margin="0,10,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,5">
+                            <Run Text="1. When you launch the application, you'll see the splash screen with 'LET'S PARTY!' message"/>
+                            <LineBreak/>
+                            <Run Text="2. Enter the Firebase URL (default is pre-filled) and click Connect"/>
+                            <LineBreak/>
+                            <Run Text="3. Login with one of the default accounts or register a new account"/>
+                            <LineBreak/>
+                            <Run Text="4. Choose your account type: DJ, Venue Owner, or Both"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- User Roles -->
+                <Border Background="White" Padding="20" Margin="0,0,0,10" CornerRadius="5">
+                    <StackPanel>
+                        <TextBlock Text="2. USER ROLES &amp; PERMISSIONS" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="SysAdmin (Highest Level):" FontSize="14" FontWeight="Bold" Margin="0,5,0,5" Foreground="#E74C3C"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Full access to all system features"/>
+                            <LineBreak/>
+                            <Run Text="• Can create, edit, and delete Admin accounts"/>
+                            <LineBreak/>
+                            <Run Text="• Can promote users to Admin or Manager"/>
+                            <LineBreak/>
+                            <Run Text="• Receives all error notifications in chat"/>
+                            <LineBreak/>
+                            <Run Text="• Can manage all users, venues, and bookings"/>
+                            <LineBreak/>
+                            <Run Text="• Full RadioBOSS control access"/>
+                        </TextBlock>
+
+                        <TextBlock Text="Admin/Manager:" FontSize="14" FontWeight="Bold" Margin="0,5,0,5" Foreground="#3498DB"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Can manage bookings and venues"/>
+                            <LineBreak/>
+                            <Run Text="• Can edit user permissions (except creating admins)"/>
+                            <LineBreak/>
+                            <Run Text="• Can view and manage most system functions"/>
+                            <LineBreak/>
+                            <Run Text="• Limited RadioBOSS access based on permissions"/>
+                        </TextBlock>
+
+                        <TextBlock Text="Standard User:" FontSize="14" FontWeight="Bold" Margin="0,5,0,5" Foreground="#27AE60"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Can create and view bookings"/>
+                            <LineBreak/>
+                            <Run Text="• Can register venues if they're a Venue Owner"/>
+                            <LineBreak/>
+                            <Run Text="• Can edit their own bookings"/>
+                            <LineBreak/>
+                            <Run Text="• Can customize their app appearance"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Main Features -->
+                <Border Background="White" Padding="20" Margin="0,0,0,10" CornerRadius="5">
+                    <StackPanel>
+                        <TextBlock Text="3. MAIN FEATURES" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="DJ Bookings:" FontSize="14" FontWeight="Bold" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Click 'Create New Booking' to add a booking"/>
+                            <LineBreak/>
+                            <Run Text="• Select venue, date, time, and enter details"/>
+                            <LineBreak/>
+                            <Run Text="• Set booking status: Pending, Confirmed, Completed, Cancelled"/>
+                            <LineBreak/>
+                            <Run Text="• Edit or delete existing bookings from the grid"/>
+                            <LineBreak/>
+                            <Run Text="• Filter and search bookings by various criteria"/>
+                        </TextBlock>
+
+                        <TextBlock Text="Venue Management:" FontSize="14" FontWeight="Bold" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Register new venues with detailed information"/>
+                            <LineBreak/>
+                            <Run Text="• Add venue capacity, location, amenities"/>
+                            <LineBreak/>
+                            <Run Text="• Toggle venue active/inactive status"/>
+                            <LineBreak/>
+                            <Run Text="• Edit venue details and contact information"/>
+                            <LineBreak/>
+                            <Run Text="• View booking history for each venue"/>
+                        </TextBlock>
+
+                        <TextBlock Text="User Management (Admin/SysAdmin Only):" FontSize="14" FontWeight="Bold" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Add new users manually"/>
+                            <LineBreak/>
+                            <Run Text="• Edit user information and roles"/>
+                            <LineBreak/>
+                            <Run Text="• Set detailed permissions per user"/>
+                            <LineBreak/>
+                            <Run Text="• Activate/deactivate user accounts"/>
+                            <LineBreak/>
+                            <Run Text="• Promote users to Manager or Admin"/>
+                        </TextBlock>
+
+                        <TextBlock Text="Chat System:" FontSize="14" FontWeight="Bold" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Click 'Chat' button to open communication panel"/>
+                            <LineBreak/>
+                            <Run Text="• Send messages to all users or specific roles"/>
+                            <LineBreak/>
+                            <Run Text="• SysAdmin receives all error notifications"/>
+                            <LineBreak/>
+                            <Run Text="• Real-time message updates"/>
+                            <LineBreak/>
+                            <Run Text="• Chat history is preserved across sessions"/>
+                        </TextBlock>
+
+                        <TextBlock Text="RadioBOSS Integration:" FontSize="14" FontWeight="Bold" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Control RadioBOSS player remotely"/>
+                            <LineBreak/>
+                            <Run Text="• View current playlist and track information"/>
+                            <LineBreak/>
+                            <Run Text="• Play, pause, stop, skip tracks"/>
+                            <LineBreak/>
+                            <Run Text="• Requires proper permissions to access"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Customization -->
+                <Border Background="White" Padding="20" Margin="0,0,0,10" CornerRadius="5">
+                    <StackPanel>
+                        <TextBlock Text="4. CUSTOMIZATION" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Theme Settings:" FontSize="14" FontWeight="Bold" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Go to Settings > My Settings"/>
+                            <LineBreak/>
+                            <Run Text="• Choose from Default or Dark Green (Fluoro) themes"/>
+                            <LineBreak/>
+                            <Run Text="• Create custom themes with your own colors"/>
+                            <LineBreak/>
+                            <Run Text="• Preview theme before applying"/>
+                        </TextBlock>
+
+                        <TextBlock Text="Login Options:" FontSize="14" FontWeight="Bold" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Remember Me: Saves your username for next login"/>
+                            <LineBreak/>
+                            <Run Text="• Auto Login: Automatically logs you in on startup"/>
+                            <LineBreak/>
+                            <Run Text="• Both options can be configured in My Settings"/>
+                        </TextBlock>
+
+                        <TextBlock Text="Window Options:" FontSize="14" FontWeight="Bold" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Stay On Top: Keeps main window above other applications"/>
+                            <LineBreak/>
+                            <Run Text="• All windows are resizable (except splash screen)"/>
+                            <LineBreak/>
+                            <Run Text="• Settings > Stay On Top to toggle"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Troubleshooting -->
+                <Border Background="White" Padding="20" Margin="0,0,0,10" CornerRadius="5">
+                    <StackPanel>
+                        <TextBlock Text="5. TROUBLESHOOTING" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Can't Login:" FontSize="14" FontWeight="Bold" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Check username and password are correct"/>
+                            <LineBreak/>
+                            <Run Text="• Verify Firebase URL is correct"/>
+                            <LineBreak/>
+                            <Run Text="• Contact SysAdmin if account is deactivated"/>
+                            <LineBreak/>
+                            <Run Text="• Use default SysAdmin credentials if needed"/>
+                        </TextBlock>
+
+                        <TextBlock Text="Connection Issues:" FontSize="14" FontWeight="Bold" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Check internet connection"/>
+                            <LineBreak/>
+                            <Run Text="• Verify Firebase URL starts with https://"/>
+                            <LineBreak/>
+                            <Run Text="• Contact administrator for correct Firebase URL"/>
+                            <LineBreak/>
+                            <Run Text="• All errors are automatically sent to SysAdmin chat"/>
+                        </TextBlock>
+
+                        <TextBlock Text="Permission Denied:" FontSize="14" FontWeight="Bold" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Contact your administrator to request access"/>
+                            <LineBreak/>
+                            <Run Text="• Check your role and permissions in User Management"/>
+                            <LineBreak/>
+                            <Run Text="• SysAdmin can grant all permissions"/>
+                        </TextBlock>
+
+                        <TextBlock Text="Error Messages:" FontSize="14" FontWeight="Bold" Margin="0,5,0,5"/>
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• All errors are automatically logged to SysAdmin chat"/>
+                            <LineBreak/>
+                            <Run Text="• Note the error code and message"/>
+                            <LineBreak/>
+                            <Run Text="• Contact SysAdmin through the chat feature"/>
+                            <LineBreak/>
+                            <Run Text="• Include what you were doing when error occurred"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Keyboard Shortcuts -->
+                <Border Background="White" Padding="20" Margin="0,0,0,10" CornerRadius="5">
+                    <StackPanel>
+                        <TextBlock Text="6. KEYBOARD SHORTCUTS" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,10"/>
+
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Alt+F: Open File menu" FontFamily="Consolas"/>
+                            <LineBreak/>
+                            <Run Text="• Alt+S: Open Settings menu" FontFamily="Consolas"/>
+                            <LineBreak/>
+                            <Run Text="• Alt+H: Open Help menu" FontFamily="Consolas"/>
+                            <LineBreak/>
+                            <Run Text="• Ctrl+N: Create new booking (when available)" FontFamily="Consolas"/>
+                            <LineBreak/>
+                            <Run Text="• F5: Refresh current view" FontFamily="Consolas"/>
+                            <LineBreak/>
+                            <Run Text="• F1: Open Help Guide" FontFamily="Consolas"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Support -->
+                <Border Background="White" Padding="20" Margin="0,0,0,10" CornerRadius="5">
+                    <StackPanel>
+                        <TextBlock Text="7. SUPPORT &amp; CONTACT" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,10"/>
+
+                        <TextBlock TextWrapping="Wrap" Margin="20,0,0,10">
+                            <Run Text="• Use the built-in Chat feature to contact administrators"/>
+                            <LineBreak/>
+                            <Run Text="• SysAdmin monitors all error notifications"/>
+                            <LineBreak/>
+                            <Run Text="• Error codes are automatically logged and sent to support"/>
+                            <LineBreak/>
+                            <Run Text="• For urgent issues, contact SysAdmin directly via chat"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Version Info -->
+                <Border Background="#3498DB" Padding="15" CornerRadius="5">
+                    <StackPanel>
+                        <TextBlock Text="DJ Booking System v1.0"
+                                  FontSize="12"
+                                  Foreground="White"
+                                  HorizontalAlignment="Center"/>
+                        <TextBlock Text="© 2024 - All Rights Reserved"
+                                  FontSize="10"
+                                  Foreground="White"
+                                  HorizontalAlignment="Center"
+                                  Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Close Button -->
+        <Border Grid.Row="2" Background="White" Padding="15" BorderBrush="#BDC3C7" BorderThickness="0,1,0,0">
+            <Button Content="Close"
+                   Click="Close_Click"
+                   Padding="30,10"
+                   FontSize="14"
+                   Background="#3498DB"
+                   Foreground="White"
+                   HorizontalAlignment="Center"
+                   Cursor="Hand"/>
+        </Border>
+    </Grid>
+</Window>

@@ -14,6 +14,29 @@ namespace DJBookingSystem.Models
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime LastLogin { get; set; }
+
+        // Account Types (can be multiple)
+        public bool IsDJ { get; set; } = false;
+        public bool IsVenueOwner { get; set; } = false;
+
+        // User App Preferences
+        public UserAppPreferences AppPreferences { get; set; } = new UserAppPreferences();
+    }
+
+    public class UserAppPreferences
+    {
+        // Theme preferences
+        public string ThemeName { get; set; } = "Default"; // "Default", "DarkGreen", "Custom"
+        public string CustomBackgroundColor { get; set; } = "#000000";
+        public string CustomTextColor { get; set; } = "#00FF00";
+        public string CustomAccentColor { get; set; } = "#00FF00";
+
+        // Login preferences
+        public bool RememberMe { get; set} = false;
+        public bool AutoLogin { get; set; } = false;
+
+        // Window preferences
+        public bool StayOnTop { get; set; } = false;
     }
 
     public enum UserRole
@@ -42,5 +65,9 @@ namespace DJBookingSystem.Models
         public bool CanManageUsers { get; set; } = false;
         public bool CanCustomizeApp { get; set; } = false;
         public bool CanAccessSettings { get; set; } = true;
+
+        // RadioBOSS permissions
+        public bool CanViewRadioBoss { get; set; } = false;
+        public bool CanControlRadioBoss { get; set; } = false;
     }
 }

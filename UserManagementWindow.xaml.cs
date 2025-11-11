@@ -109,6 +109,32 @@ namespace DJBookingSystem
             }
         }
 
+        private async void DetailedPermissions_Click(object sender, RoutedEventArgs e)
+        {
+            if (UsersDataGrid.SelectedItem is User user)
+            {
+                var detailedPermWindow = new DetailedPermissionsWindow(user);
+                if (detailedPermWindow.ShowDialog() == true && detailedPermWindow.UpdatedPermissions != null)
+                {
+                    try
+                    {
+                        user.Permissions = detailedPermWindow.UpdatedPermissions;
+                        await _firebaseService.UpdateUserAsync(user.Id ?? "", user);
+                        MessageBox.Show("Detailed permissions updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LoadUsers();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Failed to update detailed permissions: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a user to edit detailed permissions.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
         private async void ToggleActive_Click(object sender, RoutedEventArgs e)
         {
             if (UsersDataGrid.SelectedItem is User user)
