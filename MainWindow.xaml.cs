@@ -175,7 +175,48 @@ namespace DJBookingSystem
                     .AddHours(hour)
                     .AddMinutes(minute);
 
+                // VALIDATION: Check if booking is in the past
+                if (bookingDateTime < DateTime.Now)
+                {
+                    MessageBox.Show("Cannot book dates/times in the past!\n\nPlease select a future date and time.",
+                        "Invalid Date", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 var selectedVenue = (Venue)VenueComboBox.SelectedItem;
+                string djName = DJNameTextBox.Text.Trim();
+
+                // CONFLICT DETECTION: Get all existing bookings
+                var allBookings = await _firebaseService.GetAllBookingsAsync();
+
+                // Check #1: Venue Conflict - Is this venue already booked at this time?
+                var venueConflict = allBookings.FirstOrDefault(b =>
+                    b.Venue == selectedVenue.RoomName &&
+                    b.BookingDate == bookingDateTime);
+
+                if (venueConflict != null)
+                {
+                    MessageBox.Show($"VENUE CONFLICT!\n\n" +
+                        $"The venue '{selectedVenue.RoomName}' is already booked at this time by DJ {venueConflict.DJName}.\n\n" +
+                        $"Please choose a different time or venue.",
+                        "Booking Conflict", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                // Check #2: DJ Conflict - Is this DJ already booked elsewhere at this time?
+                var djConflict = allBookings.FirstOrDefault(b =>
+                    b.DJName.Equals(djName, StringComparison.OrdinalIgnoreCase) &&
+                    b.BookingDate == bookingDateTime);
+
+                if (djConflict != null)
+                {
+                    MessageBox.Show($"DJ CONFLICT!\n\n" +
+                        $"DJ {djName} is already booked at '{djConflict.Venue}' at this time.\n\n" +
+                        $"You cannot DJ in two venues at the same time!\n\n" +
+                        $"Please choose a different time.",
+                        "DJ Already Booked", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
                 var booking = new Booking
                 {
                     DJName = DJNameTextBox.Text.Trim(),
