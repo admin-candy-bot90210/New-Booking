@@ -1,0 +1,92 @@
+<Window x:Class="DJBookingSystem.VenueRegistrationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Register Your Room/Venue" Height="550" Width="600"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Text="Register Your Room/Venue for Free DJ Services"
+                          FontSize="20"
+                          FontWeight="Bold"
+                          Margin="0,0,0,10"
+                          TextWrapping="Wrap"/>
+
+                <TextBlock Text="All DJ services are provided free of charge! DJ slots are 1 hour long."
+                          FontSize="12"
+                          FontStyle="Italic"
+                          Foreground="#27AE60"
+                          Margin="0,0,0,20"
+                          TextWrapping="Wrap"/>
+
+                <!-- Room/Venue Information -->
+                <Border Background="#ECF0F1" Padding="15" Margin="0,0,0,15">
+                    <StackPanel>
+                        <TextBlock Text="Room/Venue Information" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Room Name:*" Margin="0,5,0,2"/>
+                        <TextBox x:Name="RoomNameTextBox" Padding="5"/>
+                        <TextBlock Text="Example: The Blue Room, Main Hall, Studio A"
+                                  FontSize="11"
+                                  FontStyle="Italic"
+                                  Foreground="Gray"
+                                  Margin="0,2,0,0"/>
+
+                        <TextBlock Text="Room Description:*" Margin="0,15,0,2"/>
+                        <TextBox x:Name="RoomDescriptionTextBox"
+                                Padding="5"
+                                Height="80"
+                                TextWrapping="Wrap"
+                                AcceptsReturn="True"
+                                VerticalScrollBarVisibility="Auto"/>
+                        <TextBlock Text="Describe your room/venue (capacity, equipment, atmosphere, etc.)"
+                                  FontSize="11"
+                                  FontStyle="Italic"
+                                  Foreground="Gray"
+                                  Margin="0,2,0,0"/>
+
+                        <TextBlock Text="Opening Hours:*" Margin="0,15,0,2"/>
+                        <TextBox x:Name="OpeningHoursTextBox"
+                                Padding="5"
+                                Height="60"
+                                TextWrapping="Wrap"
+                                AcceptsReturn="True"
+                                VerticalScrollBarVisibility="Auto"/>
+                        <TextBlock Text="Example: Mon-Fri: 6PM-2AM, Sat-Sun: 8PM-4AM"
+                                  FontSize="11"
+                                  FontStyle="Italic"
+                                  Foreground="Gray"
+                                  Margin="0,2,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <CheckBox x:Name="AcceptTermsCheckBox"
+                         Margin="0,10,0,0">
+                    <TextBlock Text="I confirm that all information is accurate and I agree to host DJs at this venue free of charge. Each DJ slot is 1 hour long."
+                              TextWrapping="Wrap"/>
+                </CheckBox>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="Register Room/Venue"
+                   Click="RegisterVenue_Click"
+                   Padding="20,10"
+                   Margin="5"
+                   Background="#27AE60"
+                   Foreground="White"
+                   FontSize="14"
+                   FontWeight="Bold"/>
+            <Button Content="Cancel"
+                   Click="Cancel_Click"
+                   Padding="20,10"
+                   Margin="5"/>
+        </StackPanel>
+    </Grid>
+</Window>

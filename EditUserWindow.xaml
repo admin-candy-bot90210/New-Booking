@@ -1,0 +1,67 @@
+<Window x:Class="DJBookingSystem.EditUserWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Edit User" Height="550" Width="500"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock x:Name="TitleTextBlock"
+                          Text="Edit User"
+                          FontSize="20"
+                          FontWeight="Bold"
+                          Margin="0,0,0,20"/>
+
+                <TextBlock Text="Username:*" Margin="0,5,0,2"/>
+                <TextBox x:Name="UsernameTextBox" Padding="5"/>
+
+                <TextBlock Text="Full Name:*" Margin="0,10,0,2"/>
+                <TextBox x:Name="FullNameTextBox" Padding="5"/>
+
+                <TextBlock Text="Email:*" Margin="0,10,0,2"/>
+                <TextBox x:Name="EmailTextBox" Padding="5"/>
+
+                <TextBlock x:Name="PasswordLabel" Text="Password:*" Margin="0,10,0,2"/>
+                <PasswordBox x:Name="PasswordBox" Padding="5"/>
+                <TextBlock x:Name="PasswordHintTextBlock"
+                          Text="Leave blank to keep current password"
+                          FontSize="11"
+                          FontStyle="Italic"
+                          Foreground="Gray"
+                          Margin="0,2,0,0"
+                          Visibility="Collapsed"/>
+
+                <TextBlock Text="Role:*" Margin="0,10,0,2"/>
+                <ComboBox x:Name="RoleComboBox" Padding="5">
+                    <ComboBoxItem Content="SysAdmin" Tag="SysAdmin"/>
+                    <ComboBoxItem Content="Manager" Tag="Manager"/>
+                    <ComboBoxItem Content="User" Tag="User" IsSelected="True"/>
+                </ComboBox>
+
+                <CheckBox x:Name="IsActiveCheckBox"
+                         Content="Account Active"
+                         IsChecked="True"
+                         Margin="0,15,0,0"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="Save"
+                   Click="Save_Click"
+                   Padding="20,10"
+                   Margin="5"
+                   Background="#27AE60"
+                   Foreground="White"/>
+            <Button Content="Cancel"
+                   Click="Cancel_Click"
+                   Padding="20,10"
+                   Margin="5"/>
+        </StackPanel>
+    </Grid>
+</Window>
