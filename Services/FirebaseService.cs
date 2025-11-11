@@ -428,6 +428,12 @@ namespace DJBookingSystem.Services
             user.BanReason = reason;
             user.BanExpiry = expiryDate;
 
+            // Store the IP that was banned
+            if (!string.IsNullOrEmpty(user.CurrentIP))
+            {
+                user.BannedIP = user.CurrentIP;
+            }
+
             await UpdateUserAsync(user.Id!, user);
 
             // Log moderation action
@@ -572,6 +578,78 @@ namespace DJBookingSystem.Services
         {
             var users = await GetAllUsersAsync();
             return users.Where(u => u.IsGloballyMuted).ToList();
+        }
+
+        // Check if IP address is banned
+        public async Task<bool> IsIPBannedAsync(string ipAddress)
+        {
+            if (string.IsNullOrEmpty(ipAddress))
+                return false;
+
+            var users = await GetAllUsersAsync();
+
+            // Check if any banned user has this IP
+            return users.Any(u => u.IsBanned &&
+                                 (u.BannedIP == ipAddress ||
+                                  u.CurrentIP == ipAddress ||
+                                  u.RegisteredIP == ipAddress ||
+                                  u.IPHistory.Contains(ipAddress)));
+        }
+
+        // Get banned user by IP
+        public async Task<User?> GetBannedUserByIPAsync(string ipAddress)
+        {
+            if (string.IsNullOrEmpty(ipAddress))
+                return null;
+
+            var users = await GetAllUsersAsync();
+
+            return users.FirstOrDefault(u => u.IsBanned &&
+                                            (u.BannedIP == ipAddress ||
+                                             u.CurrentIP == ipAddress ||
+                                             u.RegisteredIP == ipAddress ||
+                                             u.IPHistory.Contains(ipAddress)));
+        }
+
+        // Update user IP tracking
+        public async Task UpdateUserIPAsync(string userId, string newIP)
+        {
+            var user = await GetUserByIdAsync(userId);
+            if (user == null) return;
+
+            // Update current IP
+            user.CurrentIP = newIP;
+
+            // Add to history if not already present
+            if (!user.IPHistory.Contains(newIP))
+            {
+                user.IPHistory.Add(newIP);
+            }
+
+            await UpdateUserAsync(userId, user);
+        }
+
+        // Get user by ID
+        private async Task<User?> GetUserByIdAsync(string id)
+        {
+            try
+            {
+                var user = await _firebaseClient
+                    .Child(UsersNode)
+                    .Child(id)
+                    .OnceSingleAsync<User>();
+
+                if (user != null)
+                {
+                    user.Id = id;
+                }
+
+                return user;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         // Log error to chat (automatically sent to SysAdmin)

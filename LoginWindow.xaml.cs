@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows;
 using DJBookingSystem.Models;
 using DJBookingSystem.Services;
+using DJBookingSystem.Utilities;
 
 namespace DJBookingSystem
 {
@@ -54,6 +55,27 @@ namespace DJBookingSystem
 
             try
             {
+                // Get current IP address
+                string currentIP = await IPHelper.GetPublicIPAddressAsync();
+
+                // Check if this IP is banned
+                var bannedUser = await _firebaseService.GetBannedUserByIPAsync(currentIP);
+                if (bannedUser != null)
+                {
+                    string banMessage = $"This IP address has been banned.";
+                    if (bannedUser.BanExpiry.HasValue)
+                    {
+                        banMessage += $"\nBan expires: {bannedUser.BanExpiry.Value:MMM dd, yyyy HH:mm}";
+                    }
+                    if (!string.IsNullOrEmpty(bannedUser.BanReason))
+                    {
+                        banMessage += $"\n\nReason: {bannedUser.BanReason}";
+                    }
+                    banMessage += "\n\nIf you believe this is a mistake, please contact an administrator.";
+                    ShowError(banMessage);
+                    return;
+                }
+
                 // Get user from Firebase
                 var user = await _firebaseService.GetUserByUsernameAsync(username);
 
@@ -128,8 +150,15 @@ namespace DJBookingSystem
                     return;
                 }
 
-                // Update last login
+                // Update last login and IP tracking
                 user.LastLogin = DateTime.Now;
+                user.CurrentIP = currentIP;
+
+                // Add to IP history if not already present
+                if (!user.IPHistory.Contains(currentIP))
+                {
+                    user.IPHistory.Add(currentIP);
+                }
 
                 // Safety check: Only update if user has valid ID
                 if (!string.IsNullOrEmpty(user.Id))

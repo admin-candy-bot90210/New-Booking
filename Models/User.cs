@@ -37,6 +37,12 @@ namespace DJBookingSystem.Models
         public string? MutedBy { get; set; } // Username of moderator who muted
         public DateTime? MutedAt { get; set; }
         public DateTime? MuteExpiry { get; set; } // Null = permanent mute
+
+        // IP tracking for ban enforcement
+        public string? RegisteredIP { get; set; } // IP used during registration
+        public string? CurrentIP { get; set; } // Last login IP
+        public List<string> IPHistory { get; set; } = new List<string>(); // Track all IPs used
+        public string? BannedIP { get; set; } // IP that was banned (if applicable)
     }
 
     public class UserAppPreferences

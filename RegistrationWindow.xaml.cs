@@ -6,6 +6,7 @@ using System.Text;
 using System.Windows;
 using DJBookingSystem.Models;
 using DJBookingSystem.Services;
+using DJBookingSystem.Utilities;
 
 namespace DJBookingSystem
 {
@@ -124,6 +125,23 @@ namespace DJBookingSystem
                     return;
                 }
 
+                // Get current IP address
+                string currentIP = await IPHelper.GetPublicIPAddressAsync();
+
+                // Check if this IP is banned
+                var bannedUser = await _firebaseService.GetBannedUserByIPAsync(currentIP);
+                if (bannedUser != null)
+                {
+                    string banMessage = "This IP address has been banned and cannot create new accounts.";
+                    if (bannedUser.BanExpiry.HasValue)
+                    {
+                        banMessage += $"\nBan expires: {bannedUser.BanExpiry.Value:MMM dd, yyyy HH:mm}";
+                    }
+                    banMessage += "\n\nIf you believe this is a mistake, please contact an administrator.";
+                    MessageBox.Show(banMessage, "IP Banned", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
                 // Check if username already exists
                 var existingUser = await _firebaseService.GetUserByUsernameAsync(UsernameTextBox.Text.Trim());
                 if (existingUser != null)
@@ -146,7 +164,10 @@ namespace DJBookingSystem
                     DJLogoUrl = isDJ ? DJLogoUrlTextBox.Text.Trim() : "",
                     Permissions = GetDefaultPermissionsForAccountType(isDJ, isVenueOwner),
                     IsActive = true,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.Now,
+                    RegisteredIP = currentIP,
+                    CurrentIP = currentIP,
+                    IPHistory = new System.Collections.Generic.List<string> { currentIP }
                 };
 
                 // Save to Firebase
