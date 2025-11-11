@@ -13,22 +13,22 @@ namespace DJBookingSystem.Models
 
     public class ThemeSettings
     {
-        // Primary colors
-        public string HeaderBackgroundColor { get; set; } = "#2C3E50";
-        public string HeaderTextColor { get; set; } = "#FFFFFF";
-        public string AccentColor { get; set; } = "#3498DB";
-        public string SuccessColor { get; set; } = "#27AE60";
-        public string DangerColor { get; set; } = "#E74C3C";
-        public string BackgroundColor { get; set; } = "#ECF0F1";
+        // Primary colors - Matrix/Terminal style (Black background with fluorescent green)
+        public string HeaderBackgroundColor { get; set; } = "#000000"; // Pure black
+        public string HeaderTextColor { get; set; } = "#00FF00"; // Fluorescent green
+        public string AccentColor { get; set; } = "#00FF00"; // Fluorescent green
+        public string SuccessColor { get; set; } = "#39FF14"; // Neon green
+        public string DangerColor { get; set; } = "#FF0000"; // Bright red for contrast
+        public string BackgroundColor { get; set; } = "#0A0A0A"; // Near black (slight gray to reduce eye strain)
 
         // Text
-        public string PrimaryTextColor { get; set; } = "#000000";
-        public string SecondaryTextColor { get; set; } = "#7F8C8D";
+        public string PrimaryTextColor { get; set; } = "#00FF00"; // Fluorescent green
+        public string SecondaryTextColor { get; set; } = "#00CC00"; // Slightly darker green
 
         // Fonts
         public int HeaderFontSize { get; set; } = 24;
         public int NormalFontSize { get; set; } = 14;
-        public string FontFamily { get; set; } = "Segoe UI";
+        public string FontFamily { get; set; } = "Consolas"; // Monospace font for terminal aesthetic
     }
 
     public class FeatureSettings

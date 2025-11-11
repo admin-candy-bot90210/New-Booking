@@ -50,17 +50,17 @@ namespace DJBookingSystem.Models
         // Theme preferences
         public string ThemeName { get; set; } = "Default"; // "Default", "Night", "DarkGreen", "Sunset", "Ocean", "Custom"
 
-        // Comprehensive custom theme colors
-        public string CustomBackgroundColor { get; set; } = "#ECF0F1";
-        public string CustomTextColor { get; set; } = "#2C3E50";
-        public string CustomHeaderColor { get; set; } = "#2C3E50";
-        public string CustomMenuColor { get; set; } = "#34495E";
-        public string CustomButtonColor { get; set; } = "#3498DB";
-        public string CustomButtonTextColor { get; set; } = "#FFFFFF";
-        public string CustomBorderColor { get; set; } = "#BDC3C7";
-        public string CustomAccentColor { get; set; } = "#3498DB";
-        public string CustomSuccessColor { get; set; } = "#27AE60";
-        public string CustomErrorColor { get; set; } = "#E74C3C";
+        // Comprehensive custom theme colors - Matrix/Terminal style (Black with fluorescent green)
+        public string CustomBackgroundColor { get; set; } = "#0A0A0A"; // Near black
+        public string CustomTextColor { get; set; } = "#00FF00"; // Fluorescent green
+        public string CustomHeaderColor { get; set; } = "#000000"; // Pure black
+        public string CustomMenuColor { get; set; } = "#000000"; // Pure black
+        public string CustomButtonColor { get; set; } = "#001100"; // Very dark green
+        public string CustomButtonTextColor { get; set; } = "#00FF00"; // Fluorescent green
+        public string CustomBorderColor { get; set; } = "#00FF00"; // Fluorescent green
+        public string CustomAccentColor { get; set; } = "#00FF00"; // Fluorescent green
+        public string CustomSuccessColor { get; set; } = "#39FF14"; // Neon green
+        public string CustomErrorColor { get; set; } = "#FF0000"; // Bright red
 
         // Login preferences
         public bool RememberMe { get; set} = false;

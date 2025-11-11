@@ -12,17 +12,17 @@ namespace DJBookingSystem.Services
             {
                 "Default", new ThemeColors
                 {
-                    Name = "Default (Day Mode)",
-                    Background = "#ECF0F1",
-                    Text = "#2C3E50",
-                    Header = "#2C3E50",
-                    Menu = "#34495E",
-                    Button = "#3498DB",
-                    ButtonText = "#FFFFFF",
-                    Border = "#BDC3C7",
-                    Accent = "#3498DB",
-                    Success = "#27AE60",
-                    Error = "#E74C3C"
+                    Name = "Default (Matrix Terminal)",
+                    Background = "#0A0A0A", // Near black
+                    Text = "#00FF00", // Fluorescent green
+                    Header = "#000000", // Pure black
+                    Menu = "#000000", // Pure black
+                    Button = "#001100", // Very dark green
+                    ButtonText = "#00FF00", // Fluorescent green
+                    Border = "#00FF00", // Fluorescent green
+                    Accent = "#00FF00", // Fluorescent green
+                    Success = "#39FF14", // Neon green
+                    Error = "#FF0000" // Bright red
                 }
             },
             {
@@ -230,15 +230,15 @@ namespace DJBookingSystem.Services
     public class ThemeColors
     {
         public string Name { get; set; } = "Default";
-        public string Background { get; set; } = "#ECF0F1";
-        public string Text { get; set; } = "#2C3E50";
-        public string Header { get; set; } = "#2C3E50";
-        public string Menu { get; set; } = "#34495E";
-        public string Button { get; set; } = "#3498DB";
-        public string ButtonText { get; set; } = "#FFFFFF";
-        public string Border { get; set; } = "#BDC3C7";
-        public string Accent { get; set; } = "#3498DB";
-        public string Success { get; set; } = "#27AE60";
-        public string Error { get; set; } = "#E74C3C";
+        public string Background { get; set; } = "#0A0A0A"; // Near black
+        public string Text { get; set; } = "#00FF00"; // Fluorescent green
+        public string Header { get; set; } = "#000000"; // Pure black
+        public string Menu { get; set; } = "#000000"; // Pure black
+        public string Button { get; set; } = "#001100"; // Very dark green
+        public string ButtonText { get; set; } = "#00FF00"; // Fluorescent green
+        public string Border { get; set; } = "#00FF00"; // Fluorescent green
+        public string Accent { get; set; } = "#00FF00"; // Fluorescent green
+        public string Success { get; set; } = "#39FF14"; // Neon green
+        public string Error { get; set; } = "#FF0000"; // Bright red
     }
 }
