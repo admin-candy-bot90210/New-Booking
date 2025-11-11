@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DJ Booking System - Live Stream & Book Your Gigs</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f4f4f4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .logo p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .nav {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .nav a:hover {
+            opacity: 0.8;
+        }
+
+        .btn-login {
+            background: #3498DB;
+            padding: 0.5rem 1.5rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: #27AE60;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #3498DB;
+        }
+
+        /* Stream Section */
+        .stream-section {
+            padding: 3rem 0;
+            background: white;
+        }
+
+        .stream-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #2C3E50;
+        }
+
+        .player-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2C3E50 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .now-playing {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .dj-info {
+            color: white;
+        }
+
+        .dj-info h3 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #3498DB;
+        }
+
+        .dj-info p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .player-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        #audioPlayer {
+            width: 100%;
+            height: 50px;
+            border-radius: 10px;
+        }
+
+        .stream-url-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .stream-url-input input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 2px solid #3498DB;
+            border-radius: 5px;
+            background: #34495E;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .stream-url-input button {
+            padding: 0.8rem 1.5rem;
+            background: #27AE60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .stream-url-input button:hover {
+            background: #229954;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #34495E;
+        }
+
+        .stat-item {
+            text-align: center;
+            color: white;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #3498DB;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Schedule Section */
+        .schedule-section {
+            padding: 3rem 0;
+            background: #ECF0F1;
+        }
+
+        .schedule-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #2C3E50;
+        }
+
+        .schedule-filter {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .schedule-filter select {
+            padding: 0.8rem 2rem;
+            border: 2px solid #3498DB;
+            border-radius: 5px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .schedule-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .schedule-item {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 1.5rem;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+
+        .schedule-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .schedule-time {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498DB;
+            min-width: 100px;
+        }
+
+        .schedule-details h3 {
+            color: #2C3E50;
+            margin-bottom: 0.3rem;
+        }
+
+        .schedule-details p {
+            color: #7F8C8D;
+            font-size: 0.9rem;
+        }
+
+        .schedule-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .status-confirmed {
+            background: #27AE60;
+            color: white;
+        }
+
+        .status-pending {
+            background: #F39C12;
+            color: white;
+        }
+
+        .status-live {
+            background: #E74C3C;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Venues Section */
+        .venues-section {
+            padding: 3rem 0;
+            background: white;
+        }
+
+        .venues-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #2C3E50;
+        }
+
+        .venues-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .venue-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .venue-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .venue-card h3 {
+            color: #2C3E50;
+            margin-bottom: 0.5rem;
+        }
+
+        .venue-card p {
+            color: #7F8C8D;
+            margin-bottom: 0.5rem;
+        }
+
+        .venue-status {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+
+        .status-open {
+            background: #27AE60;
+            color: white;
+        }
+
+        .status-closed {
+            background: #95A5A6;
+            color: white;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 3rem 0;
+            background: #2C3E50;
+            color: white;
+        }
+
+        .about-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .about-card {
+            background: #34495E;
+            padding: 2rem;
+            border-radius: 10px;
+        }
+
+        .about-card h3 {
+            color: #3498DB;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .about-card p {
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .about-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .about-card ul li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .about-card ul li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27AE60;
+            font-weight: bold;
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 2rem 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            color: #3498DB;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 0.3rem 0;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .footer-section a:hover {
+            opacity: 1;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #34495E;
+            opacity: 0.8;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #7F8C8D;
+            font-style: italic;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header .container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .now-playing {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .schedule-item {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>🎵 DJ Booking System</h1>
+                <p>Live DJ Streams & Free Venue Bookings</p>
+            </div>
+            <nav class="nav">
+                <a href="#stream">Live Stream</a>
+                <a href="#bookings">Today's Schedule</a>
+                <a href="#venues">Venues</a>
+                <a href="#about">About</a>
+                <a href="#" class="btn-login" onclick="openDesktopApp()">Login to App</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>Experience Live DJ Sets 24/7</h2>
+            <p>Free DJ services for venues | Book your slot now</p>
+            <div class="hero-buttons">
+                <a href="#bookings" class="btn btn-primary">View Schedule</a>
+                <a href="#" onclick="openDesktopApp()" class="btn btn-secondary">Download DJ App</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Stream Player Section -->
+    <section id="stream" class="stream-section">
+        <div class="container">
+            <h2>🔴 Now Playing</h2>
+            <div class="player-card">
+                <div class="now-playing">
+                    <div class="dj-info">
+                        <h3 id="currentDJ">Loading DJ...</h3>
+                        <p id="currentVenue">Loading venue...</p>
+                        <p id="currentTime">--:-- - --:--</p>
+                    </div>
+                    <div class="player-controls">
+                        <audio id="audioPlayer" controls>
+                            <source id="audioSource" src="" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <div class="stream-url-input">
+                            <input type="text" id="streamUrl" placeholder="Enter custom stream URL...">
+                            <button onclick="loadCustomStream()">Load Stream</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="liveListeners">0</span>
+                        <span class="stat-label">Live Listeners</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="todayBookings">0</span>
+                        <span class="stat-label">Today's DJs</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalVenues">0</span>
+                        <span class="stat-label">Active Venues</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Today's Schedule -->
+    <section id="bookings" class="schedule-section">
+        <div class="container">
+            <h2>📅 Today's DJ Schedule</h2>
+            <div class="schedule-filter">
+                <select id="venueFilter" onchange="filterSchedule()">
+                    <option value="all">All Venues</option>
+                </select>
+            </div>
+            <div id="scheduleList" class="schedule-list">
+                <p class="loading">Loading schedule...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Venues Section -->
+    <section id="venues" class="venues-section">
+        <div class="container">
+            <h2>🏢 Available Venues</h2>
+            <div id="venuesList" class="venues-grid">
+                <p class="loading">Loading venues...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2>About DJ Booking System</h2>
+            <div class="about-content">
+                <div class="about-card">
+                    <h3>🎧 For DJs</h3>
+                    <p>Book free 1-hour slots at venues across the network. Stream your sets live and build your audience.</p>
+                    <ul>
+                        <li>Free venue access</li>
+                        <li>Live streaming support</li>
+                        <li>Easy booking system</li>
+                        <li>Professional venues</li>
+                    </ul>
+                </div>
+                <div class="about-card">
+                    <h3>🏢 For Venues</h3>
+                    <p>Offer your space to talented DJs for free. Get live entertainment and build your community.</p>
+                    <ul>
+                        <li>Free DJ services</li>
+                        <li>Schedule management</li>
+                        <li>Discord notifications</li>
+                        <li>Automated bookings</li>
+                    </ul>
+                </div>
+                <div class="about-card">
+                    <h3>🎵 For Listeners</h3>
+                    <p>Enjoy live DJ sets 24/7 from venues around the world. Discover new music and artists.</p>
+                    <ul>
+                        <li>24/7 live streams</li>
+                        <li>Multiple venues</li>
+                        <li>Diverse music styles</li>
+                        <li>Free access</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>DJ Booking System</h4>
+                    <p>Connecting DJs, venues, and music lovers worldwide.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="#stream">Live Stream</a>
+                    <a href="#bookings">Schedule</a>
+                    <a href="#venues">Venues</a>
+                    <a href="#" onclick="openDesktopApp()">Desktop App</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>Email: info@djbooking.com</p>
+                    <p>Support: support@djbooking.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 DJ Booking System. All rights reserved.</p>
+                <p>🤖 Built with Claude Code</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            databaseURL: "https://new-booking-system-46908-default-rtdb.firebaseio.com/"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Global variables
+        let currentBookings = [];
+        let currentVenues = [];
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTodaysSchedule();
+            loadVenues();
+            loadCurrentlyPlaying();
+            updateStats();
+
+            // Refresh data every 30 seconds
+            setInterval(() => {
+                loadTodaysSchedule();
+                loadVenues();
+                updateStats();
+            }, 30000);
+        });
+
+        // Load today's schedule
+        async function loadTodaysSchedule() {
+            try {
+                const bookingsRef = database.ref('bookings');
+                const snapshot = await bookingsRef.once('value');
+                const bookings = [];
+
+                snapshot.forEach((childSnapshot) => {
+                    const booking = childSnapshot.val();
+                    booking.id = childSnapshot.key;
+                    bookings.push(booking);
+                });
+
+                // Filter for today's bookings
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                currentBookings = bookings.filter(booking => {
+                    const bookingDate = new Date(booking.BookingDate);
+                    bookingDate.setHours(0, 0, 0, 0);
+                    return bookingDate.getTime() === today.getTime();
+                });
+
+                // Sort by time
+                currentBookings.sort((a, b) => new Date(a.BookingDate) - new Date(b.BookingDate));
+
+                displaySchedule(currentBookings);
+            } catch (error) {
+                console.error('Error loading schedule:', error);
+                document.getElementById('scheduleList').innerHTML = '<p class="loading">Failed to load schedule</p>';
+            }
+        }
+
+        // Display schedule
+        function displaySchedule(bookings) {
+            const scheduleList = document.getElementById('scheduleList');
+
+            if (bookings.length === 0) {
+                scheduleList.innerHTML = '<p class="loading">No bookings scheduled for today</p>';
+                return;
+            }
+
+            const now = new Date();
+
+            scheduleList.innerHTML = bookings.map(booking => {
+                const bookingTime = new Date(booking.BookingDate);
+                const endTime = new Date(bookingTime.getTime() + (booking.DurationHours || 1) * 60 * 60 * 1000);
+                const isLive = now >= bookingTime && now <= endTime;
+                const isPending = now < bookingTime;
+
+                let statusClass = 'status-confirmed';
+                let statusText = 'Confirmed';
+
+                if (isLive) {
+                    statusClass = 'status-live';
+                    statusText = '🔴 LIVE NOW';
+                } else if (isPending) {
+                    statusClass = 'status-pending';
+                    statusText = 'Upcoming';
+                } else if (booking.Status === 'Pending') {
+                    statusClass = 'status-pending';
+                    statusText = 'Pending';
+                }
+
+                return `
+                    <div class="schedule-item">
+                        <div class="schedule-time">
+                            ${formatTime(bookingTime)}
+                        </div>
+                        <div class="schedule-details">
+                            <h3>${booking.DJName}</h3>
+                            <p>📍 ${booking.Venue}</p>
+                            <p>⏱️ ${formatTime(bookingTime)} - ${formatTime(endTime)}</p>
+                        </div>
+                        <div class="schedule-status ${statusClass}">
+                            ${statusText}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Load venues
+        async function loadVenues() {
+            try {
+                const venuesRef = database.ref('venues');
+                const snapshot = await venuesRef.once('value');
+                const venues = [];
+
+                snapshot.forEach((childSnapshot) => {
+                    const venue = childSnapshot.val();
+                    venue.id = childSnapshot.key;
+                    venues.push(venue);
+                });
+
+                currentVenues = venues;
+                displayVenues(venues);
+                updateVenueFilter(venues);
+            } catch (error) {
+                console.error('Error loading venues:', error);
+                document.getElementById('venuesList').innerHTML = '<p class="loading">Failed to load venues</p>';
+            }
+        }
+
+        // Display venues
+        function displayVenues(venues) {
+            const venuesList = document.getElementById('venuesList');
+
+            if (venues.length === 0) {
+                venuesList.innerHTML = '<p class="loading">No venues available</p>';
+                return;
+            }
+
+            venuesList.innerHTML = venues.map(venue => `
+                <div class="venue-card">
+                    <h3>${venue.RoomName}</h3>
+                    <p>${venue.RoomDescription}</p>
+                    <p><strong>Hours:</strong> ${venue.OpeningHours}</p>
+                    <span class="venue-status ${venue.IsOpen ? 'status-open' : 'status-closed'}">
+                        ${venue.IsOpen ? '✓ Open for Bookings' : '✗ Closed'}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        // Update venue filter
+        function updateVenueFilter(venues) {
+            const venueFilter = document.getElementById('venueFilter');
+            const currentValue = venueFilter.value;
+
+            venueFilter.innerHTML = '<option value="all">All Venues</option>' +
+                venues.map(venue => `<option value="${venue.RoomName}">${venue.RoomName}</option>`).join('');
+
+            if (currentValue) {
+                venueFilter.value = currentValue;
+            }
+        }
+
+        // Filter schedule by venue
+        function filterSchedule() {
+            const venueFilter = document.getElementById('venueFilter');
+            const selectedVenue = venueFilter.value;
+
+            if (selectedVenue === 'all') {
+                displaySchedule(currentBookings);
+            } else {
+                const filtered = currentBookings.filter(booking => booking.Venue === selectedVenue);
+                displaySchedule(filtered);
+            }
+        }
+
+        // Load currently playing
+        function loadCurrentlyPlaying() {
+            const now = new Date();
+            const currentBooking = currentBookings.find(booking => {
+                const bookingTime = new Date(booking.BookingDate);
+                const endTime = new Date(bookingTime.getTime() + (booking.DurationHours || 1) * 60 * 60 * 1000);
+                return now >= bookingTime && now <= endTime;
+            });
+
+            if (currentBooking) {
+                document.getElementById('currentDJ').textContent = currentBooking.DJName;
+                document.getElementById('currentVenue').textContent = `At ${currentBooking.Venue}`;
+
+                const bookingTime = new Date(currentBooking.BookingDate);
+                const endTime = new Date(bookingTime.getTime() + (currentBooking.DurationHours || 1) * 60 * 60 * 1000);
+                document.getElementById('currentTime').textContent =
+                    `${formatTime(bookingTime)} - ${formatTime(endTime)}`;
+            } else {
+                document.getElementById('currentDJ').textContent = 'No DJ currently live';
+                document.getElementById('currentVenue').textContent = 'Check the schedule for upcoming sets';
+                document.getElementById('currentTime').textContent = '';
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            // Simulate live listeners (you can connect this to actual analytics)
+            document.getElementById('liveListeners').textContent = Math.floor(Math.random() * 100) + 50;
+            document.getElementById('todayBookings').textContent = currentBookings.length;
+            document.getElementById('totalVenues').textContent = currentVenues.filter(v => v.IsOpen).length;
+        }
+
+        // Load custom stream
+        function loadCustomStream() {
+            const streamUrl = document.getElementById('streamUrl').value.trim();
+
+            if (!streamUrl) {
+                alert('Please enter a stream URL');
+                return;
+            }
+
+            if (!streamUrl.startsWith('http://') && !streamUrl.startsWith('https://')) {
+                alert('Please enter a valid URL starting with http:// or https://');
+                return;
+            }
+
+            const audioPlayer = document.getElementById('audioPlayer');
+            const audioSource = document.getElementById('audioSource');
+
+            audioSource.src = streamUrl;
+            audioPlayer.load();
+            audioPlayer.play().catch(error => {
+                alert('Failed to load stream. Please check the URL and try again.');
+                console.error('Stream load error:', error);
+            });
+        }
+
+        // Format time
+        function formatTime(date) {
+            return date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+
+        // Open desktop app
+        function openDesktopApp() {
+            alert('To download the DJ Booking System desktop application:\n\n' +
+                  '1. Contact your administrator for the download link\n' +
+                  '2. Or visit our GitHub releases page\n\n' +
+                  'The desktop app allows you to:\n' +
+                  '- Book DJ slots\n' +
+                  '- Register venues\n' +
+                  '- Manage your schedule\n' +
+                  '- Stream live audio\n' +
+                  '- And much more!');
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
