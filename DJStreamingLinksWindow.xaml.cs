@@ -12,11 +12,22 @@ namespace DJBookingSystem
     {
         private FirebaseService _firebaseService;
         private List<User> _allDJs = new List<User>();
+        private User _currentUser;
 
-        public DJStreamingLinksWindow(FirebaseService firebaseService)
+        public DJStreamingLinksWindow(FirebaseService firebaseService, User currentUser)
         {
             InitializeComponent();
             _firebaseService = firebaseService;
+            _currentUser = currentUser;
+
+            // Admin-only check
+            if (_currentUser.Role != UserRole.SysAdmin && _currentUser.Role != UserRole.Manager)
+            {
+                MessageBox.Show("Access Denied: Only administrators can view DJ streaming links directory.",
+                    "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+                this.Close();
+                return;
+            }
 
             LoadDJLinks();
         }
