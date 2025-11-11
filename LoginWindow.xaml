@@ -4,7 +4,15 @@
         Title="DJ Booking System - Login" Height="450" Width="450"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize"
-        Background="#ECF0F1">
+        Background="#ECF0F1"
+        Opacity="0">
+    <Window.Resources>
+        <!-- Fade-in animation -->
+        <Storyboard x:Key="FadeInAnimation">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                           From="0.0" To="1.0" Duration="0:0:0.8"/>
+        </Storyboard>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

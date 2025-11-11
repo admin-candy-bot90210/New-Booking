@@ -24,6 +24,13 @@ namespace DJBookingSystem
                 UsernameTextBox.Text = loginInfo.Username;
                 RememberMeCheckBox.IsChecked = true;
             }
+
+            // Trigger fade-in animation when window loads
+            Loaded += (s, e) =>
+            {
+                var fadeIn = (System.Windows.Media.Animation.Storyboard)FindResource("FadeInAnimation");
+                fadeIn.Begin(this);
+            };
         }
 
         private async void Login_Click(object sender, RoutedEventArgs e)

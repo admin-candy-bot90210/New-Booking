@@ -213,6 +213,18 @@ namespace DJBookingSystem
                 var selectedVenue = (Venue)VenueComboBox.SelectedItem;
                 string djName = DJNameTextBox.Text.Trim();
 
+                // VALIDATION: Check if venue is open on the selected day
+                DayOfWeek selectedDay = bookingDateTime.DayOfWeek;
+                if (selectedVenue.OpeningSchedule != null && !selectedVenue.OpeningSchedule.IsDayOpen(selectedDay))
+                {
+                    string dayName = selectedDay.ToString();
+                    MessageBox.Show($"VENUE CLOSED!\n\n" +
+                        $"The venue '{selectedVenue.RoomName}' is not open on {dayName}s.\n\n" +
+                        $"Please select a different day when the venue is open.",
+                        "Venue Not Open", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 // CONFLICT DETECTION: Get all existing bookings
                 var allBookings = await _firebaseService.GetAllBookingsAsync();
 
